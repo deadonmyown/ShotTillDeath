@@ -99,10 +99,10 @@ public:
 	 * Call it if FinishManually == false.
 	 */
 	UFUNCTION(BlueprintCallable, Category="InteractionSystem")
-	bool FinishInteraction(AActor* Actor);
+	bool FinishInteractionByActor(AActor* Actor);
 
 	UFUNCTION(BlueprintCallable, Category="InteractionSystem")
-	bool FinishInteraction(FQueueData& Data);
+	bool FinishInteractionByQueueData(FQueueData& Data);
 
 	/** Stops interaction.*/
 	UFUNCTION(BlueprintCallable, Category="InteractionSystem")
@@ -121,13 +121,16 @@ public:
 	bool GetFirstInteractionData(FInteractionData& InteractionData);
 
 	UFUNCTION(BlueprintCallable, Category="InteractionSystem")
+	bool UpdateInteractionMessage(const AActor* Actor, const FString& NewMessage);
+
+	UFUNCTION(BlueprintCallable, Category="InteractionSystem")
 	AActor* GetFirstActor();
 
 	UFUNCTION(BlueprintCallable, Category="InteractionSystem")
 	bool GetInteractionData(AActor* Actor, FInteractionData& InteractionData);
 
 	UFUNCTION(BlueprintCallable, Category="InteractionSystem")
-	FInteractionData& FindInteractionData(AActor* Actor);
+	FInteractionData& FindInteractionData(const AActor* Actor);
 
 	UFUNCTION(BlueprintCallable, Category="InteractionSystem")
 	void SortInteractionQueue();
@@ -140,6 +143,9 @@ public:
 
 	UFUNCTION(BlueprintSetter, Category="InteractionSystem")
 	void SetUseLineOfSight(const bool Value);
+
+	UFUNCTION(BlueprintCallable, Category="InteractionSystem")
+	bool GetPlayerViewport(const AActor* Actor, FVector& ViewLocation, FRotator& ViewRotation);
 
 private:
 	/** If true, the FinishInteraction() must be called manually.*/
@@ -176,7 +182,7 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Interaction", meta=(AllowPrivateAccess))
 	AActor* ActorInSight = nullptr;
 
-	AActor* GetActorInSight() const;
+	AActor* GetActorInSight();
 
 	void SortByLineOfSight(const AActor* Actor);
 		

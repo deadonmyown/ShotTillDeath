@@ -3,12 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
+#include "InteractionQueueComponent.h"
+#include "Components/SphereComponent.h"
 #include "InteractionComponent.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class SHOTTILLDEATH_API UInteractionComponent : public UActorComponent
+class SHOTTILLDEATH_API UInteractionComponent : public USphereComponent
 {
 	GENERATED_BODY()
 
@@ -24,5 +25,52 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+	UPROPERTY(BlueprintAssignable, Category="InteractionSystem")
+	FOnQueueChanged OnActorAdded;
+
+	UPROPERTY(BlueprintAssignable, Category="InteractionSystem")
+	FOnQueueChanged OnActorRemoved;
+
+	UFUNCTION(BlueprintCallable, Category="InteractionSystem")
+	void SetInteractionMessage(AActor* Actor, const FString& Message);
+
+	UFUNCTION(BlueprintCallable, Category="InteractionSystem")
+	bool UpdateInteractionMessage(const AActor* Actor, const AActor* InteractiveActor, const FString& NewMessage);
+
+	UFUNCTION(BlueprintCallable, Category="InteractionSystem")
+	bool InteractionQueueHasActor(const AActor* Actor, const AActor* InteractiveActor);
+
+	UFUNCTION(BlueprintCallable, Category="InteractionSystem")
+	bool AddToInteractionQueue(const AActor* Actor, AActor* InteractiveActor, const FInteractionData& Data);
+
+	UFUNCTION(BlueprintCallable, Category="InteractionSystem")
+	bool RemoveFromInteractionQueue(const AActor* Actor, const AActor* InteractiveActor);
+
+	UFUNCTION(BlueprintSetter, Category="InteractionSystem")
+	void SetInteractionData(const FInteractionData& Value);
+
+	UFUNCTION(BlueprintGetter, Category="InteractionSystem")
+	FInteractionData GetInteractionData() const;
+	
+private:
+	UPROPERTY(EditDefaultsOnly,
+		BlueprintGetter=GetInteractionData,
+		BlueprintSetter=SetInteractionData,
+		Category="Interaction",
+		meta=(AllowPrivateAccess))
+	FInteractionData InteractionData;
+
+	UFUNCTION()
+	virtual void HandleBeginOverlap(UPrimitiveComponent* OverlappedComponent,
+									AActor* OtherActor,
+									UPrimitiveComponent* OtherComp,
+									int32 OtherBodyIndex,
+									bool bFromSweep,
+									const FHitResult& SweepResult);
+
+	UFUNCTION()
+	virtual void HandleEndOverlap(UPrimitiveComponent* OverlappedComponent,
+								  AActor* OtherActor,
+								  UPrimitiveComponent* OtherComp,
+								  int32 OtherBodyIndex);
 };

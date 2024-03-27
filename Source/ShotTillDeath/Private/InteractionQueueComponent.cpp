@@ -1,7 +1,8 @@
 #include "InteractionQueueComponent.h"
 
 #include "InteractionInterface.h"
-#include "EntitySystem/MovieSceneEntitySystemRunner.h"
+#include "GameFramework/Character.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 UInteractionQueueComponent::UInteractionQueueComponent()
 {
@@ -86,10 +87,10 @@ bool UInteractionQueueComponent::StartInteraction()
 	OnInteractionStarted.Broadcast(Data.Actor);
 	IInteractionInterface::Execute_StartInteraction(Data.Actor, GetOwner());
 
-	return bFinishManually ? true : FinishInteraction(Data);
+	return bFinishManually ? true : FinishInteractionByActor(GetFirstActor());
 }
 
-bool UInteractionQueueComponent::FinishInteraction(AActor* Actor)
+bool UInteractionQueueComponent::FinishInteractionByActor(AActor* Actor)
 {
 	bool bResult = false;
 
@@ -117,7 +118,7 @@ bool UInteractionQueueComponent::FinishInteraction(AActor* Actor)
 	return bResult;
 }
 
-bool UInteractionQueueComponent::FinishInteraction(FQueueData& Data)
+bool UInteractionQueueComponent::FinishInteractionByQueueData(FQueueData& Data)
 {
 	bool bResult = false;
 
@@ -201,6 +202,17 @@ bool UInteractionQueueComponent::GetFirstInteractionData(FInteractionData& Inter
 	return true;
 }
 
+bool UInteractionQueueComponent::UpdateInteractionMessage(const AActor* Actor, const FString& NewMessage)
+{
+	if(!QueueHasActor(Actor))
+	{
+		return false;
+	}
+
+	FindInteractionData(Actor).InteractionMessage = NewMessage;
+	return true;
+}
+
 AActor* UInteractionQueueComponent::GetFirstActor()
 {
 	if(IsQueueEmpty())
@@ -222,7 +234,7 @@ bool UInteractionQueueComponent::GetInteractionData(AActor* Actor, FInteractionD
 	return true;
 }
 
-FInteractionData& UInteractionQueueComponent::FindInteractionData(AActor* Actor)
+FInteractionData& UInteractionQueueComponent::FindInteractionData(const AActor* Actor)
 {
 	auto Predicate = [&](const FQueueData& Data) { return Data.Actor == Actor; };
 	return InteractionQueue.FindByPredicate(Predicate)->InteractionData;
@@ -235,7 +247,11 @@ void UInteractionQueueComponent::SortInteractionQueue()
 		return;
 	}
 
-	InteractionQueue.Sort();
+	auto Predicate = [&] (const FQueueData& DataA, const FQueueData& DataB)
+	{
+		return DataA.InteractionData.bRequireLineOfSight >= DataB.InteractionData.bRequireLineOfSight;
+	};
+	InteractionQueue.Sort(Predicate);
 }
 
 bool UInteractionQueueComponent::IsQueueEmpty()
@@ -255,13 +271,97 @@ void UInteractionQueueComponent::SetUseLineOfSight(const bool Value)
 	SortInteractionQueue();
 }
 
-AActor* UInteractionQueueComponent::GetActorInSight() const
+bool UInteractionQueueComponent::GetPlayerViewport(const AActor* Actor, FVector& ViewLocation, FRotator& ViewRotation)
 {
-	
+	const ACharacter* Character = Cast<ACharacter>(Actor);
+
+	if(!Character)
+	{
+		return false;
+	}
+
+	if(Character->IsPlayerControlled())
+	{
+		const APlayerController* Controller = Character->GetController<APlayerController>();
+
+		if(!Controller)
+		{
+			return false;
+		}
+
+		Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+	}
+
+	return true;
+}
+
+
+AActor* UInteractionQueueComponent::GetActorInSight()
+{
+	FVector ViewLocation{FVector::ZeroVector};
+	FRotator ViewRotation{FRotator::ZeroRotator};
+
+	if(!GetPlayerViewport(GetOwner(), ViewLocation, ViewRotation))
+	{
+		return nullptr;
+	}
+
+	const FVector TraceStart {ViewLocation};
+	const FVector TraceDirection {ViewRotation.Vector()};
+	const FVector TraceEnd {TraceStart + TraceDirection * SightDistance};
+
+	if(!GetWorld())
+	{
+		return nullptr;
+	}
+
+	FHitResult HitResult;
+	UKismetSystemLibrary::SphereTraceSingle(GetWorld(),
+		TraceStart,
+		TraceEnd,
+		SightRadius,
+		TraceChannel,
+		false,
+		{GetOwner()},
+		EDrawDebugTrace::ForDuration,
+		HitResult,
+		true,
+		FLinearColor::Red,
+		FLinearColor::Green,
+		0.05f);
+	return HitResult.GetActor();
 }
 
 void UInteractionQueueComponent::SortByLineOfSight(const AActor* Actor)
 {
+	FInteractionData InteractionData;
+
+	if(!IsValid(Actor) || !QueueHasActor(Actor))
+	{
+		GetFirstInteractionData(InteractionData);
+
+		if(InteractionData.bRequireLineOfSight)
+		{
+			SortInteractionQueue();
+		}
+		
+		return;
+	}
+
+	auto Predicate = [&](const FQueueData& Data) {return Data.Actor == Actor;};
+	const FQueueData QueueData = *InteractionQueue.FindByPredicate(Predicate);
+	InteractionData = QueueData.InteractionData;
+
+	if(InteractionData.bRequireLineOfSight)
+	{
+		if(ActorInSight !=  QueueData.Actor)
+		{
+			StopInteraction();
+		}
+
+		const int32 Index = InteractionQueue.IndexOfByPredicate(Predicate);
+		InteractionQueue.Swap(Index, 0);
+	}
 }
 
 
