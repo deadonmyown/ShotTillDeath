@@ -40,7 +40,7 @@ struct FResourceData
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnResourceValueChange, int32, NewValue, int32, Amount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnResourceValueZero);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SHOTTILLDEATH_API UEntityResourceComponent : public UActorComponent
 {
 	GENERATED_BODY()

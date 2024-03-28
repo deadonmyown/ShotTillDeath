@@ -45,7 +45,7 @@ struct FQueueData
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInteraction, AActor*, TargetActor);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQueueChanged, const AActor*, OtherActor);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SHOTTILLDEATH_API UInteractionQueueComponent : public UActorComponent
 {
 	GENERATED_BODY()

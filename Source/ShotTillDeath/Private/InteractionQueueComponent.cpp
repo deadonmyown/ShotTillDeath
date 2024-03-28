@@ -33,12 +33,13 @@ void UInteractionQueueComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 bool UInteractionQueueComponent::Add(AActor* Actor, const FInteractionData& InteractionData)
 {
-	if(!IsValid(Actor) || QueueHasActor(Actor) || !HasInteractionInterface(Actor))
+	if(!IsValid(Actor) && QueueHasActor(Actor) && !HasInteractionInterface(Actor))
 	{
 		return false;
 	}
 	
 	InteractionQueue.Add(FQueueData{Actor, InteractionData});
+	SortInteractionQueue();
 	OnActorAdded.Broadcast(Actor);
 	return true;
 }
@@ -66,6 +67,7 @@ bool UInteractionQueueComponent::StartInteraction()
 {
 	if(IsQueueEmpty())
 	{
+		UE_LOG(LogTemp, Display, TEXT("queue is empty"));
 		return false;
 	}
 
@@ -74,11 +76,13 @@ bool UInteractionQueueComponent::StartInteraction()
 
 	if(!IsValid(Data.Actor) || !HasInteractionInterface(Data.Actor))
 	{
+		UE_LOG(LogTemp, Display, TEXT("no interface or is not valid"));
 		return false;
 	}
 
 	if(Data.InteractionData.bRequireLineOfSight && Data.Actor != ActorInSight)
 	{
+		UE_LOG(LogTemp, Display, TEXT("line of sight"));
 		return false;
 	}
 
@@ -249,7 +253,7 @@ void UInteractionQueueComponent::SortInteractionQueue()
 
 	auto Predicate = [&] (const FQueueData& DataA, const FQueueData& DataB)
 	{
-		return DataA.InteractionData.bRequireLineOfSight >= DataB.InteractionData.bRequireLineOfSight;
+		return DataA.InteractionData.bRequireLineOfSight <= DataB.InteractionData.bRequireLineOfSight;
 	};
 	InteractionQueue.Sort(Predicate);
 }
@@ -303,6 +307,7 @@ AActor* UInteractionQueueComponent::GetActorInSight()
 
 	if(!GetPlayerViewport(GetOwner(), ViewLocation, ViewRotation))
 	{
+		UE_LOG(LogTemp, Display, TEXT("No Player Viewport"));
 		return nullptr;
 	}
 
@@ -312,6 +317,7 @@ AActor* UInteractionQueueComponent::GetActorInSight()
 
 	if(!GetWorld())
 	{
+		UE_LOG(LogTemp, Display, TEXT("No World"));
 		return nullptr;
 	}
 
@@ -338,6 +344,7 @@ void UInteractionQueueComponent::SortByLineOfSight(const AActor* Actor)
 
 	if(!IsValid(Actor) || !QueueHasActor(Actor))
 	{
+		UE_LOG(LogTemp, Display, TEXT("Not Valid Actor"));
 		GetFirstInteractionData(InteractionData);
 
 		if(InteractionData.bRequireLineOfSight)
@@ -354,8 +361,9 @@ void UInteractionQueueComponent::SortByLineOfSight(const AActor* Actor)
 
 	if(InteractionData.bRequireLineOfSight)
 	{
-		if(ActorInSight !=  QueueData.Actor)
+		if(ActorInSight != QueueData.Actor)
 		{
+			UE_LOG(LogTemp, Display, TEXT("Actor in sight != actor from queueData, stop interaction"));
 			StopInteraction();
 		}
 

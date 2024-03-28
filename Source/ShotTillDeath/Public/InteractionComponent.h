@@ -8,7 +8,7 @@
 #include "InteractionComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SHOTTILLDEATH_API UInteractionComponent : public USphereComponent
 {
 	GENERATED_BODY()
