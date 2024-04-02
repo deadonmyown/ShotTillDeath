@@ -53,6 +53,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
+	bool bHasItem;
+
+	UFUNCTION(BlueprintCallable, Category="Item")
+	void SetHasItem(bool bNewHasItem);
+
+	UFUNCTION(BlueprintCallable, Category="Item")
+	bool GetHasItem();
+	
 	/** Bool for AnimBP to switch to another animation set */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
 	bool bHasRifle;

@@ -107,6 +107,16 @@ void AShotTillDeathCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+void AShotTillDeathCharacter::SetHasItem(bool bNewHasItem)
+{
+	bHasItem = bNewHasItem;
+}
+
+bool AShotTillDeathCharacter::GetHasItem()
+{
+	return bHasItem;
+}
+
 void AShotTillDeathCharacter::SetHasRifle(bool bNewHasRifle)
 {
 	bHasRifle = bNewHasRifle;
