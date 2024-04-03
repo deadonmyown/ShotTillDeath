@@ -101,6 +101,32 @@ bool UInteractionComponent::RemoveFromInteractionQueue(const AActor* Actor, cons
 	return InteractionQueueComponent->Remove(InteractiveActor);
 }
 
+void UInteractionComponent::BeginOverlap(AActor* OtherActor)
+{
+	if(!IsValid(OtherActor))
+	{
+		return;
+	}
+
+	if(AddToInteractionQueue(OtherActor, GetOwner(), InteractionData))
+	{
+		OnActorAdded.Broadcast(OtherActor);
+	}
+}
+
+void UInteractionComponent::EndOverlap(AActor* OtherActor)
+{
+	if(!IsValid(OtherActor))
+	{
+		return;
+	}
+
+	if(RemoveFromInteractionQueue(OtherActor, GetOwner()))
+	{
+		OnActorRemoved.Broadcast(OtherActor);
+	}
+}
+
 void UInteractionComponent::SetInteractionData(const FInteractionData& Value)
 {
 	InteractionData = Value;
@@ -114,28 +140,12 @@ FInteractionData UInteractionComponent::GetInteractionData() const
 void UInteractionComponent::HandleBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if(!IsValid(OtherActor))
-	{
-		return;
-	}
-
-	if(AddToInteractionQueue(OtherActor, GetOwner(), InteractionData))
-	{
-		OnActorAdded.Broadcast(OtherActor);
-	}
+	BeginOverlap(OtherActor);
 }
 
 void UInteractionComponent::HandleEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if(!IsValid(OtherActor))
-	{
-		return;
-	}
-
-	if(RemoveFromInteractionQueue(OtherActor, GetOwner()))
-	{
-		OnActorRemoved.Broadcast(OtherActor);
-	}
+	EndOverlap(OtherActor);
 }
 

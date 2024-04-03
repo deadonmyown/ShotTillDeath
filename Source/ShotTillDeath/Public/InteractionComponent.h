@@ -46,6 +46,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category="InteractionSystem")
 	bool RemoveFromInteractionQueue(const AActor* Actor, const AActor* InteractiveActor);
 
+	UFUNCTION(BlueprintCallable, Category="InteractionSystem")
+	void BeginOverlap(AActor* OtherActor);
+
+	UFUNCTION(BlueprintCallable, Category="InteractionSystem")
+	void EndOverlap(AActor* OtherActor);
+
 	UFUNCTION(BlueprintSetter, Category="InteractionSystem")
 	void SetInteractionData(const FInteractionData& Value);
 
