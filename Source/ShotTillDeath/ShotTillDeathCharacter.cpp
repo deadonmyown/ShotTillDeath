@@ -9,6 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "InteractionQueueComponent.h"
 #include "Engine/LocalPlayer.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -38,6 +39,9 @@ AShotTillDeathCharacter::AShotTillDeathCharacter()
 	Mesh1P->CastShadow = false;
 	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+
+	//Create Interaction Queue Component
+	InteractionQueueComponent=CreateDefaultSubobject<UInteractionQueueComponent>(TEXT("InteractionQueueComponent"));
 
 }
 
@@ -73,6 +77,9 @@ void AShotTillDeathCharacter::SetupPlayerInputComponent(UInputComponent* PlayerI
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AShotTillDeathCharacter::Look);
+
+		//Interacting
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AShotTillDeathCharacter::Interact);
 	}
 	else
 	{
@@ -86,7 +93,7 @@ void AShotTillDeathCharacter::Move(const FInputActionValue& Value)
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
-	if (Controller != nullptr)
+	if (Controller)
 	{
 		// add movement 
 		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
@@ -99,12 +106,22 @@ void AShotTillDeathCharacter::Look(const FInputActionValue& Value)
 	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
-	if (Controller != nullptr)
+	if (Controller)
 	{
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AShotTillDeathCharacter::Interact()
+{
+	if(!Controller || !InteractionQueueComponent)
+	{
+		return;
+	}
+
+	InteractionQueueComponent->StartInteraction();
 }
 
 void AShotTillDeathCharacter::SetHasItem(bool bNewHasItem)

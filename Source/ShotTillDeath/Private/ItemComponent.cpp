@@ -1,6 +1,7 @@
 #include "ItemComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "ItemInterface.h"
 #include "ShotTillDeath/ShotTillDeathCharacter.h"
 
 UItemComponent::UItemComponent()
@@ -46,13 +47,14 @@ void UItemComponent::AttachItem(AShotTillDeathCharacter* TargetCharacter)
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			//Subsystem->AddMappingContext(ItemMappingContext, 1);
+			Subsystem->AddMappingContext(ItemMappingContext, 1);
 		}
 
 		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 		{
 			// BindAction
-			
+			EnhancedInputComponent->BindAction(UseAction, ETriggerEvent::Triggered, this, &UItemComponent::UseItem);
+			EnhancedInputComponent->BindAction(DropAction, ETriggerEvent::Triggered, this, &UItemComponent::DropItem);
 		}
 	}
 }
@@ -74,10 +76,42 @@ void UItemComponent::DetachItem()
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			//Subsystem->RemoveMappingContext(ItemMappingContext);
+			Subsystem->RemoveMappingContext(ItemMappingContext);
+		}
+
+		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
+		{
+			// UnbindAction
+			EnhancedInputComponent->ClearActionBindings();
 		}
 	}
 
 	Character = nullptr;
+}
+
+void UItemComponent::DropItem()
+{
+	if (!Character || !Character->GetController())
+	{
+		return;
+	}
+
+	DetachItem();
+}
+
+void UItemComponent::UseItem()
+{
+	if (!Character || !Character->GetController() || !HasItemInterface())
+	{
+		return;
+	}
+
+	IItemInterface::Execute_UseItem(GetOwner());
+	OnUseItem.Broadcast();
+}
+
+bool UItemComponent::HasItemInterface()
+{
+	return GetOwner()->GetClass()->ImplementsInterface(UItemInterface::StaticClass());
 }
 

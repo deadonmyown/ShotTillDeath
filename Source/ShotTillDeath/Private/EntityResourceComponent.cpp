@@ -10,6 +10,14 @@ UEntityResourceComponent::UEntityResourceComponent()
 void UEntityResourceComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	
+}
+
+void UEntityResourceComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+	
+	ResourceData.Value = ResourceData.bUseCustomInitialValue ? ResourceData.InitialValue : ResourceData.MaxValue;
 }
 
 
