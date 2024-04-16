@@ -149,3 +149,18 @@ void UInteractionComponent::HandleEndOverlap(UPrimitiveComponent* OverlappedComp
 	EndOverlap(OtherActor);
 }
 
+void UInteractionComponent::SetTriggerDefaultCollision(UShapeComponent* ShapeComponent)
+{
+	if (!ShapeComponent)
+	{
+		return;
+	}
+
+	ShapeComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	ShapeComponent->SetCollisionObjectType(ECC_WorldDynamic);
+	ShapeComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
+	ShapeComponent->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	ShapeComponent->SetCollisionResponseToChannel(ECC_Camera, ECR_Block);
+	ShapeComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+}
+

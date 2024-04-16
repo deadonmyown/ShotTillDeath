@@ -107,7 +107,7 @@ void UItemComponent::UseItem()
 	}
 
 	IItemInterface::Execute_UseItem(GetOwner());
-	OnUseItem.Broadcast();
+	//OnUseItem.Broadcast();
 }
 
 bool UItemComponent::HasItemInterface()

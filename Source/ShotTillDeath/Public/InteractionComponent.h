@@ -57,6 +57,9 @@ public:
 
 	UFUNCTION(BlueprintGetter, Category="InteractionSystem")
 	FInteractionData GetInteractionData() const;
+
+	UFUNCTION(BlueprintCallable, Category="InteractionSystem")
+	static void SetTriggerDefaultCollision(UShapeComponent* ShapeComponent);
 	
 private:
 	UPROPERTY(EditDefaultsOnly,
