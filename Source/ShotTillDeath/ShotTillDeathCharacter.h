@@ -7,6 +7,14 @@
 #include "Logging/LogMacros.h"
 #include "ShotTillDeathCharacter.generated.h"
 
+UENUM(BlueprintType)
+enum ECharacterState
+{
+	Default = 0 UMETA(DisplayName = "Default"),
+	InShop = 1 UMETA(DisplayName = "In Shop"),
+	InTournament = 2 UMETA(DisplayName = "In Tournament")
+};
+
 class UInputComponent;
 class USkeletalMeshComponent;
 class UCameraComponent;
@@ -50,6 +58,12 @@ protected:
 
 public:
 
+	UFUNCTION(BlueprintCallable, Category=Input)
+	void SetupPlayerInputs();
+
+	UFUNCTION(BlueprintCallable, Category=Input)
+	void ClearPlayerInputs();
+
 	//Interaction Queue Component
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Interaction", meta = (AllowPrivateAccess = "true"))
 	UInteractionQueueComponent* InteractionQueueComponent;
@@ -70,25 +84,19 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Item")
 	bool GetHasItem();
-	
-	/** Bool for AnimBP to switch to another animation set */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
-	bool bHasRifle;
 
-	/** Setter to set the bool */
-	UFUNCTION(BlueprintCallable, Category = Weapon)
-	void SetHasRifle(bool bNewHasRifle);
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Character")
+	TEnumAsByte<ECharacterState> CharacterState = ECharacterState::Default;
 
-	/** Getter for the bool */
-	UFUNCTION(BlueprintCallable, Category = Weapon)
-	bool GetHasRifle();
+	UFUNCTION(BlueprintCallable, Category="Character")
+	void ChangeCharacterState(ECharacterState NewCharacterState);
+
+	/** Called for looking input */
+	void Look(const FInputActionValue& Value);
 
 protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
-
-	/** Called for looking input */
-	void Look(const FInputActionValue& Value);
 
 	/** Called for interacting input */
 	void Interact();

@@ -42,7 +42,7 @@ void APickupActor::Tick(float DeltaTime)
 
 bool APickupActor::ActivatePickup(AShotTillDeathCharacter* OtherActor)
 {
-	if (!IsValid(OtherActor))
+	if (!IsValid(OtherActor) || OtherActor->GetHasItem())
 	{
 		return false;
 	}
@@ -102,6 +102,11 @@ void APickupActor::SetInteractionData(const FInteractionData& Value)
 
 bool APickupActor::FinishInteraction_Implementation(AActor* OtherActor)
 {
+	if(!IsValid(OtherActor))
+	{
+		return false;
+	}
+	
 	if(AShotTillDeathCharacter* OtherCharacter = Cast<AShotTillDeathCharacter>(OtherActor))
 	{
 		return ActivatePickup(OtherCharacter);
@@ -111,14 +116,12 @@ bool APickupActor::FinishInteraction_Implementation(AActor* OtherActor)
 
 void APickupActor::AttachItem()
 {
-	//TargetActor = TargetCharacter;
-
 	// Check that the character is valid, and has no item yet
 	if (!IsValid(TargetActor) || TargetActor->GetHasItem())
 	{
 		return;
 	}
-
+	
 	// Attach the item to the First Person Character
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 	AttachToComponent(TargetActor->GetMesh1P(), AttachmentRules, FName(TEXT("GripPoint")));

@@ -1,7 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "ShotTillDeathCharacter.h"
-#include "ShotTillDeathProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -19,9 +18,6 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 AShotTillDeathCharacter::AShotTillDeathCharacter()
 {
-	// Character doesnt have a rifle at start
-	bHasRifle = false;
-	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 		
@@ -87,6 +83,56 @@ void AShotTillDeathCharacter::SetupPlayerInputComponent(UInputComponent* PlayerI
 	}
 }
 
+void AShotTillDeathCharacter::SetupPlayerInputs()
+{
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+		
+		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
+		{
+			// Jumping
+			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+
+			// Moving
+			EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AShotTillDeathCharacter::Move);
+
+			// Looking
+			EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AShotTillDeathCharacter::Look);
+
+			//Interacting
+			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AShotTillDeathCharacter::Interact);
+		}
+	}
+}
+
+void AShotTillDeathCharacter::ClearPlayerInputs()
+{
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->RemoveMappingContext(DefaultMappingContext);
+		}
+		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
+		{
+			// UnbindAction
+			EnhancedInputComponent->ClearActionBindings();
+		}
+	}
+}
+
+
+
+
+void AShotTillDeathCharacter::ChangeCharacterState(ECharacterState NewCharacterState)
+{
+	CharacterState = NewCharacterState;
+}
 
 void AShotTillDeathCharacter::Move(const FInputActionValue& Value)
 {
@@ -132,14 +178,4 @@ void AShotTillDeathCharacter::SetHasItem(bool bNewHasItem)
 bool AShotTillDeathCharacter::GetHasItem()
 {
 	return bHasItem;
-}
-
-void AShotTillDeathCharacter::SetHasRifle(bool bNewHasRifle)
-{
-	bHasRifle = bNewHasRifle;
-}
-
-bool AShotTillDeathCharacter::GetHasRifle()
-{
-	return bHasRifle;
 }
