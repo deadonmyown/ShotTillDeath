@@ -12,7 +12,7 @@
 class AShotTillDeathCharacter;
 class UInteractionComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPickupActivated);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUseItem, bool, bIsSuccess);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUseItem, APickupActor*, CurrPickupActor, bool, bIsSuccess);
 
 UCLASS(Blueprintable, BlueprintType)
 class SHOTTILLDEATH_API APickupActor : public AActor, public IInteractionInterface, public IItemInterface
@@ -68,6 +68,12 @@ public:
 
 	UFUNCTION(BlueprintSetter, Category="Pickup")
 	void SetInteractionData(const FInteractionData& Value);
+
+	UFUNCTION(BlueprintCallable, Category="Pickup")
+	void SetReturnOnDefaultLocation(bool NewValue);
+
+	UFUNCTION(BlueprintCallable, Category="Pickup")
+	void SetDefaultLocation(FVector NewLocation);
 	
 	/**
 	 * Called when the pickup effect was successfully activated;
@@ -88,6 +94,9 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Pickup")
 	virtual void EnablePickup();
+
+	UFUNCTION(BlueprintCallable, Category="Pickup")
+	virtual void DisablePickup();
 protected:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Components")
@@ -115,8 +124,6 @@ protected:
 	UFUNCTION(BlueprintCallable, CallInEditor, Category="Pickup")
 	void SetCurrentTransformByDefault();
 
-	virtual void DisablePickup();
-
 	/**
 	 * Called when the pickup was enabled.
 	 */
@@ -135,4 +142,8 @@ private:
 	AShotTillDeathCharacter* TargetActor = nullptr;
 
 	virtual bool FinishInteraction_Implementation(AActor* OtherActor) override;
+
+	struct FEnhancedInputActionEventBinding* UseActionEventBinding = nullptr;
+
+	FEnhancedInputActionEventBinding* DropActionEventBinding = nullptr;
 };

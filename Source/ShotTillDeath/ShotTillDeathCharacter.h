@@ -94,12 +94,12 @@ public:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
-protected:
-	/** Called for movement input */
-	void Move(const FInputActionValue& Value);
-
 	/** Called for interacting input */
 	void Interact();
+protected:
+	
+	/** Called for movement input */
+	void Move(const FInputActionValue& Value);
 
 protected:
 	// APawn interface

@@ -32,9 +32,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 	
-	/** Look Input Action */
+	/** Exit Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ExitAction;
+
+	/** Exit Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* InteractAction;
 	
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
@@ -75,6 +79,18 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tournament")
 	FRotator EnemyRotation;
+
+	UFUNCTION(BlueprintCallable, CallInEditor, Category="Tournament")
+	void SetCurrentPositionForMainCharacter();
+
+	UFUNCTION(BlueprintCallable, CallInEditor, Category="Tournament")
+	void SetCurrentPositionForEnemy();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess))
+	TObjectPtr<USceneComponent> MainCharacterTransformComponent = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess))
+	TObjectPtr<USceneComponent> EnemyTransformComponent = nullptr;
 	
 protected:
 
@@ -96,4 +112,10 @@ private:
 	AActor* TournamentEnemy = nullptr;
 	
 	virtual bool FinishInteraction_Implementation(AActor* OtherActor) override;
+
+	struct FEnhancedInputActionEventBinding* LookActionEventBinding = nullptr;
+
+	FEnhancedInputActionEventBinding* InteractActionEventBinding = nullptr;
+
+	FEnhancedInputActionEventBinding* ExitActionEventBinding = nullptr;
 };

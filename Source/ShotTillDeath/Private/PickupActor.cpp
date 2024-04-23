@@ -100,6 +100,16 @@ void APickupActor::SetInteractionData(const FInteractionData& Value)
 	InteractionData = Value;
 }
 
+void APickupActor::SetReturnOnDefaultLocation(bool NewValue)
+{
+	bReturnOnDefaultLocation = NewValue;
+}
+
+void APickupActor::SetDefaultLocation(FVector NewLocation)
+{
+	DefaultTransform.SetLocation(NewLocation);
+}
+
 bool APickupActor::FinishInteraction_Implementation(AActor* OtherActor)
 {
 	if(!IsValid(OtherActor))
@@ -140,8 +150,9 @@ void APickupActor::AttachItem()
 		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 		{
 			// BindAction
-			EnhancedInputComponent->BindAction(UseAction, ETriggerEvent::Triggered, this, &APickupActor::TryUseItem);
-			EnhancedInputComponent->BindAction(DropAction, ETriggerEvent::Triggered, this, &APickupActor::DropItem);
+			UseActionEventBinding = &EnhancedInputComponent->BindAction(UseAction, ETriggerEvent::Triggered, this, &APickupActor::TryUseItem);
+			DropActionEventBinding = &EnhancedInputComponent->BindAction(DropAction, ETriggerEvent::Triggered, this, &APickupActor::DropItem);
+			
 		}
 	}
 }
@@ -169,7 +180,8 @@ void APickupActor::DetachItem()
 		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 		{
 			// UnbindAction
-			EnhancedInputComponent->ClearActionBindings();
+			EnhancedInputComponent->RemoveBinding(*UseActionEventBinding);
+			EnhancedInputComponent->RemoveBinding(*DropActionEventBinding);
 		}
 	}
 	
@@ -199,7 +211,7 @@ void APickupActor::TryUseItem()
 	}
 
 	bool bIsSuccess = Execute_UseItem(this);
-	OnUseItem.Broadcast(bIsSuccess);
+	OnUseItem.Broadcast(this, bIsSuccess);
 }
 
 bool APickupActor::HasItemInterface()

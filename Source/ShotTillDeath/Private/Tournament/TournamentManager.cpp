@@ -17,6 +17,9 @@ ATournamentManager::ATournamentManager()
 	TournamentRootComponent = CreateDefaultSubobject<USceneComponent>("RootComponent");
 	SetRootComponent(ToRawPtr(TournamentRootComponent));
 
+	MainCharacterTransformComponent = CreateDefaultSubobject<USceneComponent>("MainCharacterTransformComponent");
+	EnemyTransformComponent = CreateDefaultSubobject<USceneComponent>("EnemyTransformComponent");
+
 	InteractionTriggerComponent = CreateDefaultSubobject<UInteractionComponent>("InteractionTrigger");
 	InteractionTriggerComponent->SetupAttachment(GetRootComponent());
 	UInteractionComponent::SetTriggerDefaultCollision(InteractionTriggerComponent);
@@ -76,6 +79,8 @@ bool ATournamentManager::StartTournament(AShotTillDeathCharacter* OtherCharacter
 	TournamentMainCharacter = OtherCharacter;
 
 	TournamentMainCharacter->ClearPlayerInputs();
+
+	DisableInteraction();
 	
 	if (APlayerController* PlayerController = Cast<APlayerController>(TournamentMainCharacter->GetController()))
 	{
@@ -87,8 +92,9 @@ bool ATournamentManager::StartTournament(AShotTillDeathCharacter* OtherCharacter
 		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 		{
 			// BindAction
-			EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, TournamentMainCharacter, &AShotTillDeathCharacter::Look);
-			EnhancedInputComponent->BindAction(ExitAction, ETriggerEvent::Triggered, this, &ATournamentManager::EndTournament);
+			LookActionEventBinding = &EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, TournamentMainCharacter, &AShotTillDeathCharacter::Look);
+			InteractActionEventBinding = &EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, TournamentMainCharacter, &AShotTillDeathCharacter::Interact);
+			ExitActionEventBinding = &EnhancedInputComponent->BindAction(ExitAction, ETriggerEvent::Triggered, this, &ATournamentManager::EndTournament);
 		}
 	}
 	
@@ -96,9 +102,8 @@ bool ATournamentManager::StartTournament(AShotTillDeathCharacter* OtherCharacter
 	TournamentMainCharacter->SetActorRotation(MainCharacterRotation);
 
 	//TODO Create Enemy
+
 	
-	
-	DisableInteraction();
 	OnTournamentStart.Broadcast();
 	
 	return true;
@@ -108,6 +113,7 @@ void ATournamentManager::EndTournament()
 {
 	if(!IsValid(TournamentMainCharacter))
 	{
+		UE_LOG(LogTemp, Display, TEXT("Not valid TournamentMainCharacter"));
 		return;
 	}
 	
@@ -123,13 +129,35 @@ void ATournamentManager::EndTournament()
 		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 		{
 			// UnbindAction
-			EnhancedInputComponent->ClearActionBindings();
+			EnhancedInputComponent->RemoveBinding(*LookActionEventBinding);
+			EnhancedInputComponent->RemoveBinding(*InteractActionEventBinding);
+			EnhancedInputComponent->RemoveBinding(*ExitActionEventBinding);
 		}
 	}
 
 	TournamentMainCharacter->SetupPlayerInputs();
 	
 	OnTournamentEnd.Broadcast();
+
+	TournamentMainCharacter = nullptr;
+}
+
+void ATournamentManager::SetCurrentPositionForMainCharacter()
+{
+	if(MainCharacterTransformComponent)
+	{
+		MainCharacterPosition = MainCharacterTransformComponent->GetComponentLocation();
+		MainCharacterRotation = MainCharacterTransformComponent->GetComponentRotation();
+	}
+}
+
+void ATournamentManager::SetCurrentPositionForEnemy()
+{
+	if(EnemyTransformComponent)
+	{
+		EnemyPosition = EnemyTransformComponent->GetComponentLocation();
+		EnemyRotation = EnemyTransformComponent->GetComponentRotation();
+	}
 }
 
 

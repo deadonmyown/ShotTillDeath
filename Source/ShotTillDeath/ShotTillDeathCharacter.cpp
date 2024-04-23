@@ -92,7 +92,7 @@ void AShotTillDeathCharacter::SetupPlayerInputs()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 		
-		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
+		/*if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 		{
 			// Jumping
 			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
@@ -106,7 +106,7 @@ void AShotTillDeathCharacter::SetupPlayerInputs()
 
 			//Interacting
 			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AShotTillDeathCharacter::Interact);
-		}
+		}*/
 	}
 }
 
@@ -118,11 +118,11 @@ void AShotTillDeathCharacter::ClearPlayerInputs()
 		{
 			Subsystem->RemoveMappingContext(DefaultMappingContext);
 		}
-		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
+		/*if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 		{
 			// UnbindAction
 			EnhancedInputComponent->ClearActionBindings();
-		}
+		}*/
 	}
 }
 
