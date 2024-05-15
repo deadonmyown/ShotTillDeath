@@ -1,5 +1,5 @@
 ﻿#include "Tournament/InjectorHolder.h"
-
+#include "ShotTillDeathBaseCharacter.h"
 #include "PickupActor.h"
 
 
@@ -46,6 +46,7 @@ void AInjectorHolder::GenerateRandomInjectors(int Count)
 		int32 RandInjectorIndex = FMath::RandRange(0, MaxRandCount - 1);
 		APickupActor* Injector = GetWorld()->SpawnActor<APickupActor>(TypesOfInjector[RandInjectorIndex], CurrentInjectorLocations[i], FRotator::ZeroRotator, SpawnInfo);
 		Injector->DisablePickup();
+		Injector->OnUseItem.AddDynamic(this, &AInjectorHolder::SetNewTurn);
 		Injector->OnUseItem.AddDynamic(this, &AInjectorHolder::SetNewActiveInjectorOnUseItem);
 		CurrentInjectors.Add(Injector);
 	}
@@ -139,5 +140,16 @@ void AInjectorHolder::ResetInjectors()
 	
 	CurrentInjectors.Reset();
 }
+
+void AInjectorHolder::TryTakeActiveInjector(AShotTillDeathBaseCharacter* OtherCharacter)
+{
+	if(!IsValid(CurrentActiveInjector))
+	{
+		return;
+	}
+
+	CurrentActiveInjector->TakePickupItem(OtherCharacter);
+}
+
 
 

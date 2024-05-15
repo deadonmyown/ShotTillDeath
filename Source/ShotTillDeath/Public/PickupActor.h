@@ -48,6 +48,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* DropAction;
 
+	UFUNCTION(BlueprintCallable, Category="Pickup")
+	bool TakePickupItem(AShotTillDeathBaseCharacter* OtherActor);
+
 	UFUNCTION(BlueprintCallable, Category="Item")
 	void AttachItem();
 
@@ -138,7 +141,7 @@ protected:
 
 private:
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Pickup", meta=(AllowPrivateAccess))
 	AShotTillDeathBaseCharacter* TargetActor = nullptr;
 
 	virtual bool FinishInteraction_Implementation(AActor* OtherActor) override;

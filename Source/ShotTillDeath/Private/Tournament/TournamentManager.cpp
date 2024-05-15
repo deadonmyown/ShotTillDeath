@@ -78,6 +78,7 @@ bool ATournamentManager::StartTournament(AShotTillDeathCharacter* OtherCharacter
 	}
 
 	TournamentMainCharacter = OtherCharacter;
+	SetCharacterTurn(OtherCharacter);
 
 	TournamentMainCharacter->ClearPlayerInputs();
 
@@ -104,7 +105,6 @@ bool ATournamentManager::StartTournament(AShotTillDeathCharacter* OtherCharacter
 
 	//TODO Create Enemy
 	SetupEnemy();
-
 	
 	OnTournamentStart.Broadcast();
 	
@@ -113,9 +113,19 @@ bool ATournamentManager::StartTournament(AShotTillDeathCharacter* OtherCharacter
 
 void ATournamentManager::EndTournament()
 {
+	if(!GetWorld())
+	{
+		return;
+	}
+	
 	if(!IsValid(TournamentMainCharacter))
 	{
 		UE_LOG(LogTemp, Display, TEXT("Not valid TournamentMainCharacter"));
+		return;
+	}
+	if(!IsValid(TournamentEnemy))
+	{
+		UE_LOG(LogTemp, Display, TEXT("Not valid TournamentEnemy"));
 		return;
 	}
 	
@@ -141,7 +151,10 @@ void ATournamentManager::EndTournament()
 	
 	OnTournamentEnd.Broadcast();
 
+	ResetCharacterTurn();
 	TournamentMainCharacter = nullptr;
+
+	GetWorld()->DestroyActor(TournamentEnemy);
 }
 
 void ATournamentManager::SetupEnemy()
@@ -192,4 +205,28 @@ void ATournamentManager::SetInteractionData(const FInteractionData& Value)
 {
 	InteractionData = Value;
 }
+
+void ATournamentManager::SetCharacterTurn(AShotTillDeathBaseCharacter* TurnCharacter)
+{
+	CurrentCharacter = TurnCharacter;
+}
+
+void ATournamentManager::ResetCharacterTurn()
+{
+	CurrentCharacter = nullptr;
+}
+
+void ATournamentManager::SwapCharacterTurn()
+{
+	if(CurrentCharacter == TournamentMainCharacter)
+	{
+		CurrentCharacter = TournamentEnemy;
+	}
+	else
+	{
+		CurrentCharacter = TournamentMainCharacter;
+	}
+}
+
+
 

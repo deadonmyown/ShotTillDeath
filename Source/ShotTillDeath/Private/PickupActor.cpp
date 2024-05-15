@@ -64,6 +64,30 @@ bool APickupActor::ActivatePickup(AShotTillDeathBaseCharacter* OtherActor)
 	return true;
 }
 
+bool APickupActor::TakePickupItem(AShotTillDeathBaseCharacter* OtherActor)
+{
+	if (!IsValid(OtherActor) || OtherActor->GetHasItem())
+	{
+		return false;
+	}
+
+	TargetActor = OtherActor;
+	
+	OnPickupActivated.Broadcast();
+
+	if (bDestroyOnActivation)
+	{
+		Destroy();
+	}
+	else
+	{
+		DisablePickup();
+		AttachItem();
+	}
+
+	return true;
+}
+
 void APickupActor::EnablePickup()
 {
 	/*if (!IsHidden())
@@ -137,7 +161,7 @@ void APickupActor::AttachItem()
 	AttachToComponent(TargetActor->GetMesh1P(), AttachmentRules, FName(TEXT("GripPoint")));
 	
 	// switch bHasItem so the animation blueprint can switch to another animation set
-	TargetActor->SetHasItem(true);
+	TargetActor->SetItem(this);
 
 	// Set up action bindings
 	if (APlayerController* PlayerController = Cast<APlayerController>(TargetActor->GetController()))
@@ -167,7 +191,7 @@ void APickupActor::DetachItem()
 	const FDetachmentTransformRules DetachmentRules(EDetachmentRule::KeepWorld, true);
 	DetachFromActor(DetachmentRules);
 
-	TargetActor->SetHasItem(false);
+	TargetActor->ResetItem();
 
 	//Clear inputs
 	if (APlayerController* PlayerController = Cast<APlayerController>(TargetActor->GetController()))

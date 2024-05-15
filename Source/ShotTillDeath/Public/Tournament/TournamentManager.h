@@ -94,6 +94,15 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess))
 	TObjectPtr<USceneComponent> EnemyTransformComponent = nullptr;
+
+	UFUNCTION(BlueprintCallable, CallInEditor, Category="Tournament")
+	void SetCharacterTurn(class AShotTillDeathBaseCharacter* TurnCharacter);
+
+	UFUNCTION(BlueprintCallable, CallInEditor, Category="Tournament")
+	void ResetCharacterTurn();
+
+	UFUNCTION(BlueprintCallable, CallInEditor, Category="Tournament")
+	void SwapCharacterTurn();
 	
 protected:
 
@@ -111,11 +120,14 @@ protected:
 	TSubclassOf<class AEnemy> TypeOfEnemy;
 
 private:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tournament", meta=(AllowPrivateAccess))
 	AShotTillDeathCharacter* TournamentMainCharacter = nullptr;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tournament", meta=(AllowPrivateAccess))
 	AEnemy* TournamentEnemy = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tournament", meta=(AllowPrivateAccess))
+	AShotTillDeathBaseCharacter* CurrentCharacter = nullptr;
 	
 	virtual bool FinishInteraction_Implementation(AActor* OtherActor) override;
 

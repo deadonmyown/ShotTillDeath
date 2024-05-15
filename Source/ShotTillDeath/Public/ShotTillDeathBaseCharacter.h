@@ -41,11 +41,23 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Item")
 	bool GetHasItem();
 
+	UFUNCTION(BlueprintCallable, Category="Item")
+	void SetItem(APickupActor* Item);
+
+	UFUNCTION(BlueprintCallable, Category="Item")
+	void ResetItem();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Item", meta=(AllowPrivateAccess))
+	class APickupActor* CurrentItem = nullptr;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Character")
 	TEnumAsByte<ECharacterState> CharacterState = ECharacterState::Default;
 
 	UFUNCTION(BlueprintCallable, Category="Character")
 	void ChangeCharacterState(ECharacterState NewCharacterState);
+
+	UFUNCTION(BlueprintCallable, Category="Character")
+	void TryUseItem();
 
 public:
 	/** Returns Mesh1P subobject **/

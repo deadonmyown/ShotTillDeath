@@ -68,6 +68,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "InjectorHolder")
 	void ResetInjectors();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "InjectorHolder")
+	void SetNewTurn(APickupActor* PickupActor, bool IsUseItemSuccess);
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess))
 	TObjectPtr<USceneComponent> FirstLocationComponent = nullptr;
 
@@ -76,6 +79,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess))
 	TObjectPtr<USceneComponent> ActiveLocationComponent = nullptr;
+
+	UFUNCTION(BlueprintCallable, Category = "InjectorHolder")
+	void TryTakeActiveInjector(class AShotTillDeathBaseCharacter* OtherCharacter);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess))
