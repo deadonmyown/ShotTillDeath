@@ -40,7 +40,7 @@ void APickupActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-bool APickupActor::ActivatePickup(AShotTillDeathCharacter* OtherActor)
+bool APickupActor::ActivatePickup(AShotTillDeathBaseCharacter* OtherActor)
 {
 	if (!IsValid(OtherActor) || OtherActor->GetHasItem())
 	{
@@ -117,7 +117,7 @@ bool APickupActor::FinishInteraction_Implementation(AActor* OtherActor)
 		return false;
 	}
 	
-	if(AShotTillDeathCharacter* OtherCharacter = Cast<AShotTillDeathCharacter>(OtherActor))
+	if(AShotTillDeathBaseCharacter* OtherCharacter = Cast<AShotTillDeathBaseCharacter>(OtherActor))
 	{
 		return ActivatePickup(OtherCharacter);
 	}

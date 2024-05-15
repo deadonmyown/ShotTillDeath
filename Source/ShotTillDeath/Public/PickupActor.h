@@ -9,7 +9,7 @@
 #include "GameFramework/Actor.h"
 #include "PickupActor.generated.h"
 
-class AShotTillDeathCharacter;
+class AShotTillDeathBaseCharacter;
 class UInteractionComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPickupActivated);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUseItem, APickupActor*, CurrPickupActor, bool, bIsSuccess);
@@ -86,7 +86,7 @@ public:
 	 * Call this function if you want to activate the pickup in your custom pickup class.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Pickup")
-	bool ActivatePickup(AShotTillDeathCharacter* OtherActor);
+	bool ActivatePickup(AShotTillDeathBaseCharacter* OtherActor);
 	
 	/**
 	 * Enables the pickup if it was disabled.
@@ -139,7 +139,7 @@ protected:
 private:
 
 	UPROPERTY()
-	AShotTillDeathCharacter* TargetActor = nullptr;
+	AShotTillDeathBaseCharacter* TargetActor = nullptr;
 
 	virtual bool FinishInteraction_Implementation(AActor* OtherActor) override;
 

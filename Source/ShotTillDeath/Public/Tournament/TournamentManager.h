@@ -68,6 +68,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Tournament")
 	void EndTournament();
 
+	UFUNCTION(BlueprintCallable, Category="Tournament")
+	void SetupEnemy();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tournament")
 	FVector MainCharacterPosition;
 
@@ -104,12 +107,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess))
 	TObjectPtr<USceneComponent> TournamentRootComponent = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tournament")
+	TSubclassOf<class AEnemy> TypeOfEnemy;
+
 private:
 	UPROPERTY()
 	AShotTillDeathCharacter* TournamentMainCharacter = nullptr;
 
 	UPROPERTY()
-	AActor* TournamentEnemy = nullptr;
+	AEnemy* TournamentEnemy = nullptr;
 	
 	virtual bool FinishInteraction_Implementation(AActor* OtherActor) override;
 

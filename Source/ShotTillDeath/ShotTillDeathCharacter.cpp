@@ -1,5 +1,3 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "ShotTillDeathCharacter.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
@@ -12,9 +10,6 @@
 #include "Engine/LocalPlayer.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
-
-//////////////////////////////////////////////////////////////////////////
-// AShotTillDeathCharacter
 
 AShotTillDeathCharacter::AShotTillDeathCharacter()
 {
@@ -56,8 +51,6 @@ void AShotTillDeathCharacter::BeginPlay()
 	}
 
 }
-
-//////////////////////////////////////////////////////////////////////////// Input
 
 void AShotTillDeathCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -126,14 +119,6 @@ void AShotTillDeathCharacter::ClearPlayerInputs()
 	}
 }
 
-
-
-
-void AShotTillDeathCharacter::ChangeCharacterState(ECharacterState NewCharacterState)
-{
-	CharacterState = NewCharacterState;
-}
-
 void AShotTillDeathCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
@@ -168,14 +153,4 @@ void AShotTillDeathCharacter::Interact()
 	}
 
 	InteractionQueueComponent->StartInteraction();
-}
-
-void AShotTillDeathCharacter::SetHasItem(bool bNewHasItem)
-{
-	bHasItem = bNewHasItem;
-}
-
-bool AShotTillDeathCharacter::GetHasItem()
-{
-	return bHasItem;
 }

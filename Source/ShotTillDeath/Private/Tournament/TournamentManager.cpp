@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InteractionComponent.h"
+#include "Enemy/Enemy.h"
 #include "ShotTillDeath/ShotTillDeathCharacter.h"
 
 
@@ -102,6 +103,7 @@ bool ATournamentManager::StartTournament(AShotTillDeathCharacter* OtherCharacter
 	TournamentMainCharacter->SetActorRotation(MainCharacterRotation);
 
 	//TODO Create Enemy
+	SetupEnemy();
 
 	
 	OnTournamentStart.Broadcast();
@@ -141,6 +143,16 @@ void ATournamentManager::EndTournament()
 
 	TournamentMainCharacter = nullptr;
 }
+
+void ATournamentManager::SetupEnemy()
+{
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.Owner = this;
+	TournamentEnemy = GetWorld()->SpawnActor<AEnemy>(TypeOfEnemy, SpawnInfo);
+	TournamentEnemy->SetActorLocation(EnemyPosition);
+	TournamentEnemy->SetActorRotation(EnemyRotation);
+}
+
 
 void ATournamentManager::SetCurrentPositionForMainCharacter()
 {

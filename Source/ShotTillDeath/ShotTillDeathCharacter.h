@@ -3,17 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "ShotTillDeathBaseCharacter.h"
+
 #include "Logging/LogMacros.h"
 #include "ShotTillDeathCharacter.generated.h"
 
-UENUM(BlueprintType)
-enum ECharacterState
-{
-	Default = 0 UMETA(DisplayName = "Default"),
-	InShop = 1 UMETA(DisplayName = "In Shop"),
-	InTournament = 2 UMETA(DisplayName = "In Tournament")
-};
+
 
 class UInputComponent;
 class USkeletalMeshComponent;
@@ -26,13 +21,9 @@ class UInteractionQueueComponent;
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config=Game)
-class AShotTillDeathCharacter : public ACharacter
+class AShotTillDeathCharacter : public AShotTillDeathBaseCharacter
 {
 	GENERATED_BODY()
-
-	/** Pawn mesh: 1st person view (arms; seen only by self) */
-	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
-	USkeletalMeshComponent* Mesh1P;
 
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -76,7 +67,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
+	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
 	bool bHasItem;
 
 	UFUNCTION(BlueprintCallable, Category="Item")
@@ -89,7 +80,7 @@ public:
 	TEnumAsByte<ECharacterState> CharacterState = ECharacterState::Default;
 
 	UFUNCTION(BlueprintCallable, Category="Character")
-	void ChangeCharacterState(ECharacterState NewCharacterState);
+	void ChangeCharacterState(ECharacterState NewCharacterState);*/
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
@@ -108,7 +99,7 @@ protected:
 
 public:
 	/** Returns Mesh1P subobject **/
-	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
+	//USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
