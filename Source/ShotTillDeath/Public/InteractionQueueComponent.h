@@ -164,7 +164,7 @@ private:
 	bool bUseLineOfSight = false;
 
 	/** Line of sight trace channel. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Interaction",
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Interaction",
 		meta=(AllowPrivateAccess, EditCondition="bUseLineOfSight"))
 	TEnumAsByte<ETraceTypeQuery> TraceChannel = UEngineTypes::ConvertToTraceType(ECC_Visibility);
 

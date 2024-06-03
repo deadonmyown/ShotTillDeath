@@ -43,9 +43,15 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "InjectorHolder")
 	FVector ActiveLocationForInjectors;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="InjectorHolder")
+	int32 InjectorsCount;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="InjectorHolder")
+	int32 InjectorsAdd;
 	
 	UFUNCTION(BlueprintCallable, Category = "InjectorHolder")
-	void GenerateRandomInjectors(int Count);
+	void GenerateRandomInjectors();
 
 	UFUNCTION(BlueprintCallable, CallInEditor, Category="InjectorHolder")
 	void SetFirstPointForInjectors();

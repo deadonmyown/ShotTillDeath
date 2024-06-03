@@ -35,6 +35,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
 	bool bHasItem;
 
+	UFUNCTION(BlueprintGetter, Category="Item")
+	bool GetCanTakeItem();
+
+	UFUNCTION(BlueprintSetter, Category="Item")
+	void SetCanTakeItem(bool bNewCanTake);
+	
+	UPROPERTY(VisibleAnywhere, BlueprintGetter=GetCanTakeItem, BlueprintSetter=SetCanTakeItem, Category="Item")
+	bool bCanTakeItem;
+
 	UFUNCTION(BlueprintCallable, Category="Item")
 	void SetHasItem(bool bNewHasItem);
 

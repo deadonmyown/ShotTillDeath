@@ -7,6 +7,9 @@ AInjectorHolder::AInjectorHolder()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	InjectorsCount = 4;
+	InjectorsAdd = 1;
+
 	InjectorRootComponent = CreateDefaultSubobject<USceneComponent>("RootComponent");
 	SetRootComponent(ToRawPtr(InjectorRootComponent));
 	
@@ -26,19 +29,19 @@ void AInjectorHolder::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AInjectorHolder::GenerateRandomInjectors(int Count)
+void AInjectorHolder::GenerateRandomInjectors()
 {
 	if(!GetWorld())
 	{
 		return;
 	}
 
-	SetInjectorsLocations(Count);
+	SetInjectorsLocations(InjectorsCount);
 
 	ResetInjectors();
 	
 	int MaxRandCount = TypesOfInjector.Num();
-	for(int i = 0; i < Count; i++)
+	for(int i = 0; i < InjectorsCount; i++)
 	{
 		FActorSpawnParameters SpawnInfo;
 		SpawnInfo.Owner = this;
@@ -106,6 +109,8 @@ void AInjectorHolder::SetNewActiveInjector()
 {
 	if(CurrentInjectors.IsEmpty())
 	{
+		InjectorsCount += InjectorsAdd;
+		GenerateRandomInjectors();
 		return;
 	}
 	

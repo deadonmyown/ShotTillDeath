@@ -100,6 +100,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Pickup")
 	virtual void DisablePickup();
+
+	UFUNCTION(BlueprintCallable, Category="Pickup")
+	FHitResult GetFloor();
+	
 protected:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Components")
@@ -149,4 +153,23 @@ private:
 	struct FEnhancedInputActionEventBinding* UseActionEventBinding = nullptr;
 
 	FEnhancedInputActionEventBinding* DropActionEventBinding = nullptr;
+
+	/** Line of sight trace channel. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Pickup",
+		meta=(AllowPrivateAccess))
+	TEnumAsByte<ETraceTypeQuery> TraceChannel = UEngineTypes::ConvertToTraceType(ECC_WorldStatic);
+
+	/** The line of sight max distance.*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Pickup",
+		meta=(AllowPrivateAccess))
+	float SightDistance = 512.f;
+
+	/** The line of sight radius. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Pickup",
+		meta=(AllowPrivateAccess))
+	float SightRadius = 32.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Pickup",
+		meta=(AllowPrivateAccess))
+	float DebugDrawTime = 1.5f;
 };

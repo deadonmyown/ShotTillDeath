@@ -4,6 +4,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InteractionComponent.h"
 #include "ItemInterface.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "ShotTillDeath/ShotTillDeathCharacter.h"
 
 APickupActor::APickupActor()
@@ -141,7 +142,7 @@ bool APickupActor::FinishInteraction_Implementation(AActor* OtherActor)
 		return false;
 	}
 	
-	if(AShotTillDeathBaseCharacter* OtherCharacter = Cast<AShotTillDeathBaseCharacter>(OtherActor))
+	if(AShotTillDeathBaseCharacter* OtherCharacter = Cast<AShotTillDeathBaseCharacter>(OtherActor) && OtherCharacter)
 	{
 		return ActivatePickup(OtherCharacter);
 	}
@@ -208,6 +209,14 @@ void APickupActor::DetachItem()
 			EnhancedInputComponent->RemoveBinding(*DropActionEventBinding);
 		}
 	}
+
+	
+	FHitResult HitResult = GetFloor();
+	if(IsValid(HitResult.GetActor()))
+	{
+		UE_LOG(LogTemp, Display, TEXT("Trace Floor: %s"), *HitResult.GetActor()->GetFName().ToString());
+		SetActorLocation(HitResult.Location);
+	}
 	
 	TargetActor = nullptr;
 }
@@ -246,6 +255,45 @@ bool APickupActor::HasItemInterface()
 void APickupActor::SetCurrentTransformByDefault()
 {
 	DefaultTransform = GetTransform();
+}
+
+FHitResult APickupActor::GetFloor()
+{
+	if(!IsValid(TargetActor))
+	{
+		UE_LOG(LogTemp, Display, TEXT("No Target Actor"));
+		return FHitResult();
+	}
+	
+	FVector ViewLocation{GetActorLocation()};
+	FRotator ViewRotation{FRotator::ZeroRotator};
+
+	const FVector TraceStart {ViewLocation};
+	const FVector TraceDirection {FVector(0,0,-1)};
+	const FVector TraceEnd {TraceStart + TraceDirection * SightDistance};
+
+	if(!GetWorld())
+	{
+		UE_LOG(LogTemp, Display, TEXT("No World"));
+		return FHitResult();
+	}
+
+	FHitResult HitResult;
+
+	UKismetSystemLibrary::LineTraceSingle(GetWorld(),
+		TraceStart,
+		TraceEnd,
+		TraceChannel,
+		false,
+		{GetOwner(), TargetActor},
+		EDrawDebugTrace::ForDuration,
+		HitResult,
+		true,
+		FLinearColor::Red,
+		FLinearColor::Green,
+		DebugDrawTime);
+	
+	return HitResult;
 }
 
 

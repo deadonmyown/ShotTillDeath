@@ -29,6 +29,16 @@ void AShotTillDeathBaseCharacter::ChangeCharacterState(ECharacterState NewCharac
 	CharacterState = NewCharacterState;
 }
 
+void AShotTillDeathBaseCharacter::SetCanTakeItem(bool bNewCanTake)
+{
+	bCanTakeItem = bNewCanTake;
+}
+
+bool AShotTillDeathBaseCharacter::GetCanTakeItem()
+{
+	return bCanTakeItem;
+}
+
 void AShotTillDeathBaseCharacter::SetHasItem(bool bNewHasItem)
 {
 	bHasItem = bNewHasItem;
