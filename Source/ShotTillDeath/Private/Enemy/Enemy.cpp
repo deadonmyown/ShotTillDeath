@@ -3,6 +3,8 @@
 AEnemy::AEnemy()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	bCanTakeItem = false;
 }
 
 void AEnemy::BeginPlay()

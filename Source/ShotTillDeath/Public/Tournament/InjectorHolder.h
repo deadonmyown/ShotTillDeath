@@ -42,7 +42,7 @@ public:
 	FVector LastLocationForInjectors;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "InjectorHolder")
-	FVector ActiveLocationForInjectors;
+	FTransform ActiveLocationForInjectors;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="InjectorHolder")
 	int32 InjectorsCount;

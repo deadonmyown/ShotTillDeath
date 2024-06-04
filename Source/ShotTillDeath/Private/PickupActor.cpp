@@ -43,7 +43,7 @@ void APickupActor::Tick(float DeltaTime)
 
 bool APickupActor::ActivatePickup(AShotTillDeathBaseCharacter* OtherActor)
 {
-	if (!IsValid(OtherActor) || OtherActor->GetHasItem())
+	if (!IsValid(OtherActor) || !OtherActor->CanTakeItem())
 	{
 		return false;
 	}
@@ -67,7 +67,7 @@ bool APickupActor::ActivatePickup(AShotTillDeathBaseCharacter* OtherActor)
 
 bool APickupActor::TakePickupItem(AShotTillDeathBaseCharacter* OtherActor)
 {
-	if (!IsValid(OtherActor) || OtherActor->GetHasItem())
+	if (!IsValid(OtherActor) || !OtherActor->CanTakeItem())
 	{
 		return false;
 	}
@@ -130,9 +130,9 @@ void APickupActor::SetReturnOnDefaultLocation(bool NewValue)
 	bReturnOnDefaultLocation = NewValue;
 }
 
-void APickupActor::SetDefaultLocation(FVector NewLocation)
+void APickupActor::SetDefaultTransform(FTransform NewTransform)
 {
-	DefaultTransform.SetLocation(NewLocation);
+	DefaultTransform = NewTransform;
 }
 
 bool APickupActor::FinishInteraction_Implementation(AActor* OtherActor)
@@ -142,7 +142,7 @@ bool APickupActor::FinishInteraction_Implementation(AActor* OtherActor)
 		return false;
 	}
 	
-	if(AShotTillDeathBaseCharacter* OtherCharacter = Cast<AShotTillDeathBaseCharacter>(OtherActor) && OtherCharacter)
+	if(AShotTillDeathBaseCharacter* OtherCharacter = Cast<AShotTillDeathBaseCharacter>(OtherActor))
 	{
 		return ActivatePickup(OtherCharacter);
 	}
@@ -152,7 +152,7 @@ bool APickupActor::FinishInteraction_Implementation(AActor* OtherActor)
 void APickupActor::AttachItem()
 {
 	// Check that the character is valid, and has no item yet
-	if (!IsValid(TargetActor) || TargetActor->GetHasItem())
+	if (!IsValid(TargetActor) || !TargetActor->CanTakeItem())
 	{
 		return;
 	}

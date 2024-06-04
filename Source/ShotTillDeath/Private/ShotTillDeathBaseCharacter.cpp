@@ -1,10 +1,11 @@
 ﻿#include "ShotTillDeathBaseCharacter.h"
 #include "PickupActor.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 AShotTillDeathBaseCharacter::AShotTillDeathBaseCharacter()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
@@ -24,6 +25,16 @@ void AShotTillDeathBaseCharacter::BeginPlay()
 	Super::BeginPlay();
 }
 
+void AShotTillDeathBaseCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if(CharacterState == InTournamentCharacterTurn)
+	{
+		ActorInSight = GetCharacterInTournament();
+	}
+}
+
 void AShotTillDeathBaseCharacter::ChangeCharacterState(ECharacterState NewCharacterState)
 {
 	CharacterState = NewCharacterState;
@@ -32,6 +43,22 @@ void AShotTillDeathBaseCharacter::ChangeCharacterState(ECharacterState NewCharac
 void AShotTillDeathBaseCharacter::SetCanTakeItem(bool bNewCanTake)
 {
 	bCanTakeItem = bNewCanTake;
+}
+
+bool AShotTillDeathBaseCharacter::CanTakeItem()
+{
+	if(CharacterState == Default)
+	{
+		return !GetHasItem();
+	}
+	else if(CharacterState == InTournamentCharacterTurn || CharacterState == InTournamentEnemyTurn)
+	{
+		return GetCanTakeItem() && !GetHasItem();
+	}
+	else
+	{
+		return false;
+	}
 }
 
 bool AShotTillDeathBaseCharacter::GetCanTakeItem()
@@ -74,6 +101,62 @@ void AShotTillDeathBaseCharacter::TryUseItem()
 	}
 
 	CurrentItem->TryUseItem();
+}
+
+AActor* AShotTillDeathBaseCharacter::GetCharacterInTournament()
+{
+	FVector ViewLocation{FVector::ZeroVector};
+	FRotator ViewRotation{FRotator::ZeroRotator};
+
+	if(!GetPlayerViewport(ViewLocation, ViewRotation))
+	{
+		UE_LOG(LogTemp, Display, TEXT("No Player Viewport"));
+		return nullptr;
+	}
+
+	const FVector TraceStart {ViewLocation};
+	const FVector TraceDirection {ViewRotation.Vector()};
+	const FVector TraceEnd {TraceStart + TraceDirection * SightDistance};
+
+	if(!GetWorld())
+	{
+		UE_LOG(LogTemp, Display, TEXT("No World"));
+		return nullptr;
+	}
+
+	FHitResult HitResult;
+
+	UKismetSystemLibrary::LineTraceSingle(GetWorld(),
+		TraceStart,
+		TraceEnd,
+		TraceChannel,
+		false,
+		{this},
+		EDrawDebugTrace::ForDuration,
+		HitResult,
+		true,
+		FLinearColor::Red,
+		FLinearColor::Green,
+		DebugDrawTime);
+	
+	return HitResult.GetActor();
+}
+
+bool AShotTillDeathBaseCharacter::GetPlayerViewport(FVector& ViewLocation, FRotator& ViewRotation)
+{
+	if(IsPlayerControlled())
+	{
+		const APlayerController* CharacterController = GetController<APlayerController>();
+
+		if(!CharacterController)
+		{
+			return false;
+		}
+
+		CharacterController->GetPlayerViewPoint(ViewLocation, ViewRotation);
+	}
+
+	return true;
 }
 
 

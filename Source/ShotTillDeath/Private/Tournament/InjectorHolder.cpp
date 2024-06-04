@@ -87,7 +87,7 @@ void AInjectorHolder::SetActiveLocationForInjectors()
 {
 	if(ActiveLocationComponent)
 	{
-		ActiveLocationForInjectors = ActiveLocationComponent->GetComponentLocation();
+		ActiveLocationForInjectors = ActiveLocationComponent->GetComponentTransform();
 	}
 }
 
@@ -117,9 +117,9 @@ void AInjectorHolder::SetNewActiveInjector()
 	int32 RandNum = FMath::RandRange(0, CurrentInjectors.Num() - 1);
 	CurrentActiveInjector = CurrentInjectors[RandNum];
 	CurrentActiveInjector->EnablePickup();
-	CurrentActiveInjector->SetActorLocation(ActiveLocationForInjectors);
+	CurrentActiveInjector->SetActorTransform(ActiveLocationForInjectors);
 	CurrentActiveInjector->SetReturnOnDefaultLocation(true);
-	CurrentActiveInjector->SetDefaultLocation(ActiveLocationForInjectors);
+	CurrentActiveInjector->SetDefaultTransform(ActiveLocationForInjectors);
 	
 	CurrentInjectors.Remove(CurrentActiveInjector);
 }

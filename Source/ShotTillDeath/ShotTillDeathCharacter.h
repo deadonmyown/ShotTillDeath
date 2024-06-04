@@ -48,6 +48,8 @@ protected:
 	virtual void BeginPlay();
 
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tournament", meta=(AllowPrivateAccess))
+	class AEnemy* Enemy = nullptr;
 
 	UFUNCTION(BlueprintCallable, Category=Input)
 	void SetupPlayerInputs();

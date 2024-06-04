@@ -6,7 +6,8 @@ AShopHolder::AShopHolder()
 	SetRootComponent(ToRawPtr(ShopRootComponent));
 	
 	MaxItemsCount = 4;
-	LocationsForItems.Init(FVector::Zero(), 4);
+	TransformsForItems.Init(FTransform::Identity, MaxItemsCount);
+	Items.Init(nullptr, MaxItemsCount);
 	for(int i = 0; i < MaxItemsCount; i++)
 	{
 		LocationsComponent.Add(CreateDefaultSubobject<USceneComponent>(*FString("LocationComponent" + FString::FromInt(i))));
@@ -24,33 +25,81 @@ void AShopHolder::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AShopHolder::AddItem(APickupActor* Item)
-{
-	if(IsShopHolderFull())
-	{
-		return;
-	}
-	Items.Add(Item);
-	Item->OnUseItem.AddDynamic(this, &AShopHolder::OnUseItem);
-}
-
 void AShopHolder::RemoveItem(APickupActor* Item)
 {
-	Items.Remove(Item);
+	const int32 ItemIndex = Items.IndexOfByKey(Item);
+	if(ItemIndex != INDEX_NONE)
+	{
+		Items[ItemIndex] = nullptr;
+	}
 }
 
-void AShopHolder::SetItemLocation(APickupActor* Item)
+void AShopHolder::AddItem(TSubclassOf<APickupActor> ItemClass)
 {
-	if(IsShopHolderFull())
+	if(!GetWorld())
 	{
 		return;
 	}
-	Item->SetActorLocation(LocationsForItems[Items.Num() - 1]);
+	
+	int32 FreeSlotIndex;
+	if(IsShopHolderFull(FreeSlotIndex))
+	{
+		return;
+	}
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.Owner = this;
+	
+	APickupActor* Item = GetWorld()->SpawnActor<APickupActor>(ItemClass, TransformsForItems[FreeSlotIndex], SpawnInfo);
+	
+	Item->SetReturnOnDefaultLocation(true);
+	Item->SetDefaultTransform(TransformsForItems[FreeSlotIndex]);
+	
+	Item->OnUseItem.AddDynamic(this, &AShopHolder::OnUseItem);
+	Items[FreeSlotIndex] = Item;
 }
 
-bool AShopHolder::IsShopHolderFull()
+bool AShopHolder::IsShopHolderFull(int32& FreeSlotIndex)
 {
-	return Items.Num() >= MaxItemsCount;
+	int32 Counter = 0;
+	FreeSlotIndex = -1;
+	for(int i = 0; i < Items.Num(); i++)
+	{
+		if(IsValid(Items[i]))
+		{
+			Counter++;
+		}
+		else if(FreeSlotIndex == -1)
+		{
+			FreeSlotIndex = i;
+		}
+	}
+
+	return Counter >= MaxItemsCount;
+}
+
+int32 AShopHolder::FreeSlotsCount()
+{
+	int32 Counter = 0;
+	for(int i = 0; i < Items.Num(); i++)
+	{
+		if(!IsValid(Items[i]))
+		{
+			Counter++;
+		}
+	}
+	return Counter;
+}
+
+int32 AShopHolder::FindFirstItem()
+{
+	for(int i = 0; i < Items.Num(); i++)
+	{
+		if(IsValid(Items[i]))
+		{
+			return i;
+		}
+	}
+	return -1;
 }
 
 void AShopHolder::OnUseItem(APickupActor* PickupActor, bool IsUseItemSuccess)
@@ -69,20 +118,20 @@ void AShopHolder::SetLocationsForItems()
 {
 	for(int i = 0; i < LocationsComponent.Num(); i++)
 	{
-		LocationsForItems[i] = LocationsComponent[i]->GetComponentLocation();
+		TransformsForItems[i] = LocationsComponent[i]->GetComponentTransform();
 	}
 }
 
 void AShopHolder::ReinitializeComponents()
 {
-	LocationsForItems.Reset();
+	TransformsForItems.Reset();
 
 	for(int i = 0; i < LocationsComponent.Num(); i++)
 	{
 		LocationsComponent[i]->DestroyComponent();
 	}
 	
-	LocationsForItems.Init(FVector::Zero(), 4);
+	TransformsForItems.Init(FTransform::Identity, 4);
 	for(int i = 0; i < MaxItemsCount; i++)
 	{
 		LocationsComponent.Add(CreateDefaultSubobject<USceneComponent>(*FString("LocationComponent" + FString::FromInt(i))));
@@ -91,7 +140,11 @@ void AShopHolder::ReinitializeComponents()
 
 void AShopHolder::TryTakeRandomItem(AShotTillDeathBaseCharacter* OtherCharacter)
 {
-	int32 RandNum = FMath::RandRange(0, Items.Num() - 1);
-	auto RandItem = Items[RandNum];
+	int32 FirstIndex = FindFirstItem();
+	if(FirstIndex == -1)
+	{
+		return;
+	}
+	auto RandItem = Items[FirstIndex];
 	RandItem->TakePickupItem(OtherCharacter);
 }

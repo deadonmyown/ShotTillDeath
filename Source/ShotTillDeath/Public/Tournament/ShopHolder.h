@@ -24,7 +24,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ShopHolder")
-	TArray<FVector> LocationsForItems;
+	TArray<FTransform> TransformsForItems;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ShopHolder")
 	TArray<class APickupActor*> Items;
@@ -33,16 +33,19 @@ public:
 	int32 MaxItemsCount;
 
 	UFUNCTION(BlueprintCallable, Category = "ShopHolder")
-	void AddItem(APickupActor* Item);
+	void AddItem(TSubclassOf<APickupActor> ItemClass);
 
 	UFUNCTION(BlueprintCallable, Category = "ShopHolder")
 	void RemoveItem(APickupActor* Item);
 	
 	UFUNCTION(BlueprintCallable, Category = "ShopHolder")
-	void SetItemLocation(APickupActor* Item);
+	int32 FindFirstItem();
 
 	UFUNCTION(BlueprintCallable, Category="ShopHolder")
-	bool IsShopHolderFull();
+	bool IsShopHolderFull(int32& FreeSlotIndex);
+	
+	UFUNCTION(BlueprintCallable, Category="ShopHolder")
+	int32 FreeSlotsCount();
 
 	UFUNCTION(BlueprintCallable, Category = "ShopHolder")
 	void OnUseItem(APickupActor* PickupActor, bool IsUseItemSuccess);

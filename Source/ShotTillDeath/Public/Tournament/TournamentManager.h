@@ -11,6 +11,8 @@ class UInteractionComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTournamentStart);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTournamentEnd);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTournamentCharacterTurn);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTournamentEnemyTurn);
 
 UCLASS()
 class SHOTTILLDEATH_API ATournamentManager : public AActor, public IInteractionInterface
@@ -49,6 +51,12 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category="Tournament")
 	FOnTournamentEnd OnTournamentEnd;
+
+	UPROPERTY(BlueprintAssignable, Category="Tournament")
+	FOnTournamentCharacterTurn OnTournamentCharacterTurn;
+
+	UPROPERTY(BlueprintAssignable, Category="Tournament")
+	FOnTournamentEnemyTurn OnTournamentEnemyTurn;
 	
 	UFUNCTION(BlueprintGetter, Category="Tournament")
 	FInteractionData GetInteractionData() const;
@@ -69,7 +77,19 @@ public:
 	void EndTournament();
 
 	UFUNCTION(BlueprintCallable, Category="Tournament")
-	void SetupEnemy();
+	void SetupCharacterAtStart();
+
+	UFUNCTION(BlueprintCallable, Category="Tournament")
+	void SetupEnemyAtStart();
+
+	UFUNCTION(BlueprintCallable, Category="Tournament")
+	void SetupCharacterAtEnd();
+
+	UFUNCTION(BlueprintCallable, Category="Tournament")
+	void SetupEnemyAtEnd();
+
+	UFUNCTION(BlueprintCallable, Category="Tournament")
+	void ClearCharacterAndEnemy();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tournament")
 	FVector MainCharacterPosition;

@@ -76,7 +76,7 @@ public:
 	void SetReturnOnDefaultLocation(bool NewValue);
 
 	UFUNCTION(BlueprintCallable, Category="Pickup")
-	void SetDefaultLocation(FVector NewLocation);
+	void SetDefaultTransform(FTransform NewTransform);
 	
 	/**
 	 * Called when the pickup effect was successfully activated;

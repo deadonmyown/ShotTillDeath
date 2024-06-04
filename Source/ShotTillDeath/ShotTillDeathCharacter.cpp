@@ -13,6 +13,8 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 AShotTillDeathCharacter::AShotTillDeathCharacter()
 {
+	bCanTakeItem = true;
+	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 		

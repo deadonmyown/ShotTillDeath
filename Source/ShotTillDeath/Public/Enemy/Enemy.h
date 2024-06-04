@@ -15,6 +15,9 @@ public:
 	// Sets default values for this character's properties
 	AEnemy();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tournament", meta=(AllowPrivateAccess))
+	class AShotTillDeathCharacter* MainCharacter = nullptr;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
