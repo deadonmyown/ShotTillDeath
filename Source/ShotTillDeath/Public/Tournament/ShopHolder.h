@@ -57,7 +57,7 @@ public:
 	void ReinitializeComponents();
 
 	UFUNCTION(BlueprintCallable, CallInEditor, Category="ShopHolder")
-	void TryTakeRandomItem(AShotTillDeathBaseCharacter* OtherCharacter);
+	bool TryTakeRandomItem(AShotTillDeathBaseCharacter* OtherCharacter);
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess))
 	TObjectPtr<USceneComponent> ShopRootComponent = nullptr;

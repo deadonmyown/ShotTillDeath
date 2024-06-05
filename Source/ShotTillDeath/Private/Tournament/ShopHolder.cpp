@@ -138,13 +138,14 @@ void AShopHolder::ReinitializeComponents()
 	}
 }
 
-void AShopHolder::TryTakeRandomItem(AShotTillDeathBaseCharacter* OtherCharacter)
+bool AShopHolder::TryTakeRandomItem(AShotTillDeathBaseCharacter* OtherCharacter)
 {
 	int32 FirstIndex = FindFirstItem();
 	if(FirstIndex == -1)
 	{
-		return;
+		return false;
 	}
 	auto RandItem = Items[FirstIndex];
 	RandItem->TakePickupItem(OtherCharacter);
+	return true;
 }
