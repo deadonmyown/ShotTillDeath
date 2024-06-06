@@ -109,10 +109,18 @@ void AShopHolder::OnUseItem(APickupActor* PickupActor, bool IsUseItemSuccess)
 		return;
 	}
 
+	PickupActor->bCanUse = false;
+	FTimerDelegate DestroyDelegate = FTimerDelegate::CreateUObject(this, &AShopHolder::DestroyItem, PickupActor);
+	GetWorldTimerManager().SetTimer(DestroyTimer, DestroyDelegate, 1.0f, false);
+}
+
+void AShopHolder::DestroyItem(APickupActor* PickupActor)
+{
 	PickupActor->DropItem();
 	RemoveItem(PickupActor);
 	GetWorld()->DestroyActor(PickupActor);
 }
+
 
 void AShopHolder::SetLocationsForItems()
 {

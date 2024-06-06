@@ -160,6 +160,7 @@ void APickupActor::AttachItem()
 	// Attach the item to the First Person Character
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 	AttachToComponent(TargetActor->GetMesh1P(), AttachmentRules, FName(TEXT("GripPoint")));
+	SetActorRelativeTransform(PickupTransform);
 	
 	// switch bHasItem so the animation blueprint can switch to another animation set
 	TargetActor->SetItem(this);
@@ -191,6 +192,7 @@ void APickupActor::DetachItem()
 	
 	const FDetachmentTransformRules DetachmentRules(EDetachmentRule::KeepWorld, true);
 	DetachFromActor(DetachmentRules);
+	SetActorRotation(FRotator::ZeroRotator);
 
 	TargetActor->ResetItem();
 
@@ -238,7 +240,7 @@ void APickupActor::DropItem()
 
 void APickupActor::TryUseItem()
 {
-	if (!TargetActor || !TargetActor->GetController() || !HasItemInterface())
+	if (!TargetActor || !TargetActor->GetController() || !HasItemInterface() || !bCanUse)
 	{
 		return;
 	}
@@ -256,6 +258,12 @@ void APickupActor::SetCurrentTransformByDefault()
 {
 	DefaultTransform = GetTransform();
 }
+
+void APickupActor::SetCurrentTransformByPickup()
+{
+	PickupTransform = GetTransform();
+}
+
 
 FHitResult APickupActor::GetFloor()
 {

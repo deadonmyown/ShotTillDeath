@@ -56,6 +56,9 @@ public:
 	UFUNCTION(BlueprintCallable, CallInEditor, Category="ShopHolder")
 	void ReinitializeComponents();
 
+	UFUNCTION(BlueprintCallable, Category="ShopHolder")
+	void DestroyItem(APickupActor* PickupActor);
+
 	UFUNCTION(BlueprintCallable, CallInEditor, Category="ShopHolder")
 	bool TryTakeRandomItem(AShotTillDeathBaseCharacter* OtherCharacter);
 protected:
@@ -64,4 +67,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess))
 	TArray<TObjectPtr<USceneComponent>> LocationsComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="ShopHolder", meta=(AllowPrivateAccess))
+	FTimerHandle DestroyTimer;
 };

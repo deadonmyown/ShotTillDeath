@@ -84,6 +84,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="Pickup")
 	FOnPickupActivated OnPickupActivated;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Pickup")
+	bool bCanUse = true;
+
 	/**
 	 * Activates the pickup logic.
 	 * Call this function if you want to activate the pickup in your custom pickup class.
@@ -126,10 +129,16 @@ protected:
 	FTransform DefaultTransform;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Pickup")
+	FTransform PickupTransform;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Pickup")
 	bool bReturnOnDefaultLocation = false;
 
 	UFUNCTION(BlueprintCallable, CallInEditor, Category="Pickup")
 	void SetCurrentTransformByDefault();
+
+	UFUNCTION(BlueprintCallable, CallInEditor, Category="Pickup")
+	void SetCurrentTransformByPickup();
 
 	/**
 	 * Called when the pickup was enabled.
