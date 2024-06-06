@@ -2,7 +2,7 @@
 
 #include "InteractionInterface.h"
 #include "GameFramework/Character.h"
-#include "Kismet/KismetSystemLibrary.h"
+
 
 UInteractionQueueComponent::UInteractionQueueComponent()
 {
@@ -329,12 +329,12 @@ AActor* UInteractionQueueComponent::GetActorInSight()
 		TraceChannel,
 		false,
 		{GetOwner()},
-		EDrawDebugTrace::ForDuration,
+		DebugTrace,
 		HitResult,
 		true,
 		FLinearColor::Red,
 		FLinearColor::Green,
-		0.05f);
+		DebugDrawTime);
 	return HitResult.GetActor();
 }
 

@@ -128,19 +128,19 @@ void AInjectorHolder::ResetInjectors()
 {
 	if(!GetWorld())
 	{
+		UE_LOG(LogTemp, Error, TEXT("NO WORLD"));
 		return;
 	}
 
 	if(IsValid(CurrentActiveInjector))
 	{
-		GetWorld()->DestroyActor(CurrentActiveInjector);
+		DestroyInjector(CurrentActiveInjector);
 	}
 	
 	for(int i = 0; i < CurrentInjectors.Num(); i++)
 	{
 		APickupActor* ActorToDestroy = CurrentInjectors[i];
-		ActorToDestroy->DropItem();
-		GetWorld()->DestroyActor(ActorToDestroy);
+		DestroyInjector(ActorToDestroy);
 	}
 	
 	CurrentInjectors.Reset();
@@ -150,10 +150,23 @@ void AInjectorHolder::TryTakeActiveInjector(AShotTillDeathBaseCharacter* OtherCh
 {
 	if(!IsValid(CurrentActiveInjector))
 	{
+		UE_LOG(LogTemp, Error, TEXT("NO INJECTOR IN ARRAY"));
 		return;
 	}
 
 	CurrentActiveInjector->TakePickupItem(OtherCharacter);
+}
+
+void AInjectorHolder::DestroyInjector(APickupActor* PickupActor)
+{
+	if(!IsValid(PickupActor))
+	{
+		UE_LOG(LogTemp, Error, TEXT("NO INJECTOR"));
+		return;
+	}
+	
+	PickupActor->DropItem();
+	GetWorld()->DestroyActor(PickupActor);
 }
 
 

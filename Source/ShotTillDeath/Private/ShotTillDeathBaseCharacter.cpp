@@ -1,7 +1,7 @@
 ﻿#include "ShotTillDeathBaseCharacter.h"
 #include "PickupActor.h"
 #include "Components/CapsuleComponent.h"
-#include "Kismet/KismetSystemLibrary.h"
+#include "Tournament/TournamentManager.h"
 
 AShotTillDeathBaseCharacter::AShotTillDeathBaseCharacter()
 {
@@ -103,6 +103,26 @@ void AShotTillDeathBaseCharacter::TryUseItem()
 	CurrentItem->TryUseItem();
 }
 
+void AShotTillDeathBaseCharacter::DropItem()
+{
+	if(!IsValid(CurrentItem))
+	{
+		return;
+	}
+
+	CurrentItem->DropItem();
+}
+
+void AShotTillDeathBaseCharacter::ExitTournament()
+{
+	if(!IsValid(CurrentTournamentManager))
+	{
+		return;
+	}
+
+	CurrentTournamentManager->EndTournament();
+}
+
 AActor* AShotTillDeathBaseCharacter::GetCharacterInTournament()
 {
 	FVector ViewLocation{FVector::ZeroVector};
@@ -132,7 +152,7 @@ AActor* AShotTillDeathBaseCharacter::GetCharacterInTournament()
 		TraceChannel,
 		false,
 		{this},
-		EDrawDebugTrace::ForDuration,
+		DebugTrace,
 		HitResult,
 		true,
 		FLinearColor::Red,

@@ -89,6 +89,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "InjectorHolder")
 	void TryTakeActiveInjector(class AShotTillDeathBaseCharacter* OtherCharacter);
 
+	UFUNCTION(BlueprintCallable, Category = "InjectorHolder")
+	void DestroyInjector(APickupActor* PickupActor);
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess))
 	TObjectPtr<USceneComponent> InjectorRootComponent = nullptr;

@@ -83,8 +83,7 @@ bool ATournamentManager::StartTournament(AShotTillDeathCharacter* OtherCharacter
 	DisableInteraction();
 
 	//Start Character setup
-	TournamentMainCharacter = OtherCharacter;
-	SetupCharacterAtStart();
+	SetupCharacterAtStart(OtherCharacter);
 	//End Character Setup
 	
 	//Enemy setup (there i init tournament enemy)
@@ -104,6 +103,7 @@ void ATournamentManager::EndTournament()
 	//Start Validation
 	if(!GetWorld())
 	{
+		UE_LOG(LogTemp, Error, TEXT("NO WORLD"));
 		return;
 	}
 	
@@ -124,33 +124,18 @@ void ATournamentManager::EndTournament()
 	
 	SetupCharacterAtEnd();
 	
-
 	ResetCharacterTurn();
 
 	OnTournamentEnd.Broadcast();
 	ClearCharacterAndEnemy();
 }
 
-void ATournamentManager::SetupCharacterAtStart()
+void ATournamentManager::SetupCharacterAtStart(AShotTillDeathCharacter* OtherCharacter)
 {
-	TournamentMainCharacter->ClearPlayerInputs();
-
+	TournamentMainCharacter = OtherCharacter;
+	TournamentMainCharacter->CurrentTournamentManager = this;
 	
-	if (APlayerController* PlayerController = Cast<APlayerController>(TournamentMainCharacter->GetController()))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->AddMappingContext(TournamentMappingContext, 2);
-		}
-
-		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
-		{
-			// BindAction
-			LookActionEventBinding = &EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, TournamentMainCharacter, &AShotTillDeathCharacter::Look);
-			InteractActionEventBinding = &EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, TournamentMainCharacter, &AShotTillDeathCharacter::Interact);
-			ExitActionEventBinding = &EnhancedInputComponent->BindAction(ExitAction, ETriggerEvent::Triggered, this, &ATournamentManager::EndTournament);
-		}
-	}
+	TournamentMainCharacter->StartTournamentClearInputs();
 	
 	TournamentMainCharacter->SetActorLocation(MainCharacterPosition);
 	TournamentMainCharacter->SetActorRotation(MainCharacterRotation);
@@ -163,26 +148,12 @@ void ATournamentManager::SetupEnemyAtStart()
 	TournamentEnemy = GetWorld()->SpawnActor<AEnemy>(TypeOfEnemy, SpawnInfo);
 	TournamentEnemy->SetActorLocation(EnemyPosition);
 	TournamentEnemy->SetActorRotation(EnemyRotation);
+	TournamentEnemy->CurrentTournamentManager = this;
 }
 
 void ATournamentManager::SetupCharacterAtEnd()
 {
-	if (APlayerController* PlayerController = Cast<APlayerController>(TournamentMainCharacter->GetController()))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->RemoveMappingContext(TournamentMappingContext);
-		}
-
-		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
-		{
-			// UnbindAction
-			EnhancedInputComponent->RemoveBinding(*LookActionEventBinding);
-			EnhancedInputComponent->RemoveBinding(*InteractActionEventBinding);
-			EnhancedInputComponent->RemoveBinding(*ExitActionEventBinding);
-		}
-	}
-	TournamentMainCharacter->SetupPlayerInputs();
+	TournamentMainCharacter->EndTournamentSetupInputs();
 }
 
 void ATournamentManager::SetupEnemyAtEnd()
@@ -192,6 +163,8 @@ void ATournamentManager::SetupEnemyAtEnd()
 
 void ATournamentManager::ClearCharacterAndEnemy()
 {
+	TournamentMainCharacter->CurrentTournamentManager = nullptr;
+	TournamentEnemy->CurrentTournamentManager = nullptr;
 	TournamentMainCharacter->Enemy = nullptr;
 	TournamentEnemy->MainCharacter = nullptr;
 	TournamentMainCharacter = nullptr;

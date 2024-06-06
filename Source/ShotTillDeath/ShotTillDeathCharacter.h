@@ -31,7 +31,7 @@ class AShotTillDeathCharacter : public AShotTillDeathBaseCharacter
 
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	UInputMappingContext* DefaultMappingContext;
+	UInputMappingContext* MovementMappingContext;
 
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
@@ -40,27 +40,11 @@ class AShotTillDeathCharacter : public AShotTillDeathBaseCharacter
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
-	
-public:
-	AShotTillDeathCharacter();
 
-protected:
-	virtual void BeginPlay();
+	/** MappingContext */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputMappingContext* DefaultMappingContext;
 
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tournament", meta=(AllowPrivateAccess))
-	class AEnemy* Enemy = nullptr;
-
-	UFUNCTION(BlueprintCallable, Category=Input)
-	void SetupPlayerInputs();
-
-	UFUNCTION(BlueprintCallable, Category=Input)
-	void ClearPlayerInputs();
-
-	//Interaction Queue Component
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Interaction", meta = (AllowPrivateAccess = "true"))
-	UInteractionQueueComponent* InteractionQueueComponent;
-	
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
@@ -69,20 +53,45 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
 
-	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
-	bool bHasItem;
+	/** MappingContext */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputMappingContext* ItemMappingContext;
 
-	UFUNCTION(BlueprintCallable, Category="Item")
-	void SetHasItem(bool bNewHasItem);
+	/** Use Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* UseAction;
 
-	UFUNCTION(BlueprintCallable, Category="Item")
-	bool GetHasItem();
+	/** Drop Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* DropAction;
+	
+	/** MappingContext */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputMappingContext* TournamentMappingContext;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Character")
-	TEnumAsByte<ECharacterState> CharacterState = ECharacterState::Default;
+	/** Exit Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ExitAction;
+	
+public:
+	AShotTillDeathCharacter();
 
-	UFUNCTION(BlueprintCallable, Category="Character")
-	void ChangeCharacterState(ECharacterState NewCharacterState);*/
+protected:
+	virtual void BeginPlay();
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Character", meta=(AllowPrivateAccess))
+	class AEnemy* Enemy = nullptr;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Character")
+	void EndTournamentSetupInputs();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Character")
+	void StartTournamentClearInputs();
+
+	//Interaction Queue Component
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character", meta = (AllowPrivateAccess = "true"))
+	UInteractionQueueComponent* InteractionQueueComponent;
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
@@ -90,6 +99,12 @@ public:
 	/** Called for interacting input */
 	void Interact();
 protected:
+
+	/** Called for movement input */
+	void Jump();
+
+	/** Called for movement input */
+	void StopJumping();
 	
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
@@ -100,8 +115,6 @@ protected:
 	// End of APawn interface
 
 public:
-	/** Returns Mesh1P subobject **/
-	//USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 

@@ -61,6 +61,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, CallInEditor, Category="ShopHolder")
 	bool TryTakeRandomItem(AShotTillDeathBaseCharacter* OtherCharacter);
+
+	UFUNCTION(BlueprintCallable, Category="ShopHolder")
+	void ResetItems();
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess))
 	TObjectPtr<USceneComponent> ShopRootComponent = nullptr;

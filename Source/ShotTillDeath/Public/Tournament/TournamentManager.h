@@ -30,22 +30,6 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	/** Look Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* LookAction;
-	
-	/** Exit Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* ExitAction;
-
-	/** Exit Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* InteractAction;
-	
-	/** MappingContext */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	class UInputMappingContext* TournamentMappingContext;
-
 	UPROPERTY(BlueprintAssignable, Category="Tournament")
 	FOnTournamentStart OnTournamentStart;
 
@@ -77,7 +61,7 @@ public:
 	void EndTournament();
 
 	UFUNCTION(BlueprintCallable, Category="Tournament")
-	void SetupCharacterAtStart();
+	void SetupCharacterAtStart(AShotTillDeathCharacter* OtherCharacter);
 
 	UFUNCTION(BlueprintCallable, Category="Tournament")
 	void SetupEnemyAtStart();
@@ -118,10 +102,10 @@ public:
 	UFUNCTION(BlueprintCallable, CallInEditor, Category="Tournament")
 	void SetCharacterTurn(class AShotTillDeathBaseCharacter* TurnCharacter);
 
-	UFUNCTION(BlueprintCallable, CallInEditor, Category="Tournament")
+	UFUNCTION(BlueprintCallable, Category="Tournament")
 	void ResetCharacterTurn();
 
-	UFUNCTION(BlueprintCallable, CallInEditor, Category="Tournament")
+	UFUNCTION(BlueprintCallable, Category="Tournament")
 	void SwapCharacterTurn();
 	
 protected:
@@ -150,10 +134,4 @@ private:
 	AShotTillDeathBaseCharacter* CurrentCharacter = nullptr;
 	
 	virtual bool FinishInteraction_Implementation(AActor* OtherActor) override;
-
-	struct FEnhancedInputActionEventBinding* LookActionEventBinding = nullptr;
-
-	FEnhancedInputActionEventBinding* InteractActionEventBinding = nullptr;
-
-	FEnhancedInputActionEventBinding* ExitActionEventBinding = nullptr;
 };

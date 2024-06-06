@@ -27,6 +27,11 @@ void AShopHolder::Tick(float DeltaTime)
 
 void AShopHolder::RemoveItem(APickupActor* Item)
 {
+	if(!IsValid(Item))
+	{
+		return;
+	}
+	
 	const int32 ItemIndex = Items.IndexOfByKey(Item);
 	if(ItemIndex != INDEX_NONE)
 	{
@@ -116,6 +121,11 @@ void AShopHolder::OnUseItem(APickupActor* PickupActor, bool IsUseItemSuccess)
 
 void AShopHolder::DestroyItem(APickupActor* PickupActor)
 {
+	if(!IsValid(PickupActor))
+	{
+		return;
+	}
+	
 	PickupActor->DropItem();
 	RemoveItem(PickupActor);
 	GetWorld()->DestroyActor(PickupActor);
@@ -156,4 +166,18 @@ bool AShopHolder::TryTakeRandomItem(AShotTillDeathBaseCharacter* OtherCharacter)
 	auto RandItem = Items[FirstIndex];
 	RandItem->TakePickupItem(OtherCharacter);
 	return true;
+}
+
+void AShopHolder::ResetItems()
+{
+	if(!GetWorld())
+	{
+		return;
+	}
+	
+	for(int i = 0; i < Items.Num(); i++)
+	{
+		APickupActor* ActorToDestroy = Items[i];
+		DestroyItem(ActorToDestroy);
+	}
 }

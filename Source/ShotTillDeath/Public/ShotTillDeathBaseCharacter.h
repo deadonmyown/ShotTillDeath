@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "ShotTillDeathBaseCharacter.generated.h"
+
 
 UENUM(BlueprintType)
 enum ECharacterState
@@ -36,35 +38,38 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	bool bHasItem;
 
-	UFUNCTION(BlueprintCallable, Category="Item")
+	UFUNCTION(BlueprintCallable, Category="Character")
 	bool CanTakeItem();
 
-	UFUNCTION(BlueprintGetter, Category="Item")
+	UFUNCTION(BlueprintGetter, Category="Character")
 	bool GetCanTakeItem();
 
-	UFUNCTION(BlueprintSetter, Category="Item")
+	UFUNCTION(BlueprintSetter, Category="Character")
 	void SetCanTakeItem(bool bNewCanTake);
 	
-	UPROPERTY(VisibleAnywhere, BlueprintGetter=GetCanTakeItem, BlueprintSetter=SetCanTakeItem, Category="Item")
+	UPROPERTY(VisibleAnywhere, BlueprintGetter=GetCanTakeItem, BlueprintSetter=SetCanTakeItem, Category="Character")
 	bool bCanTakeItem;
 
-	UFUNCTION(BlueprintCallable, Category="Item")
+	UFUNCTION(BlueprintCallable, Category="Character")
 	void SetHasItem(bool bNewHasItem);
 
-	UFUNCTION(BlueprintCallable, Category="Item")
+	UFUNCTION(BlueprintCallable, Category="Character")
 	bool GetHasItem();
 
-	UFUNCTION(BlueprintCallable, Category="Item")
-	void SetItem(APickupActor* Item);
+	UFUNCTION(BlueprintCallable, Category="Character")
+	void SetItem(class APickupActor* Item);
 
-	UFUNCTION(BlueprintCallable, Category="Item")
+	UFUNCTION(BlueprintCallable, Category="Character")
 	void ResetItem();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Item", meta=(AllowPrivateAccess))
-	class APickupActor* CurrentItem = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Character", meta=(AllowPrivateAccess))
+	APickupActor* CurrentItem = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Character", meta=(AllowPrivateAccess))
+	class ATournamentManager* CurrentTournamentManager = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Character")
 	TEnumAsByte<ECharacterState> CharacterState = ECharacterState::Default;
@@ -74,6 +79,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Character")
 	void TryUseItem();
+
+	UFUNCTION(BlueprintCallable, Category="Character")
+	void DropItem();
+
+	UFUNCTION(BlueprintCallable, Category="Character")
+	void ExitTournament();
 
 	UFUNCTION(BlueprintCallable, Category="Character")
 	AActor* GetCharacterInTournament();
@@ -107,5 +118,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Character",
 		meta=(AllowPrivateAccess))
-	float DebugDrawTime = 0.5f;
+	TEnumAsByte<EDrawDebugTrace::Type> DebugTrace = EDrawDebugTrace::Type::None;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Character",
+		meta=(AllowPrivateAccess))
+	float DebugDrawTime = 0.01f;
 };

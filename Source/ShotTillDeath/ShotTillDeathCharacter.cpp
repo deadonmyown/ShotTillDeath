@@ -8,6 +8,7 @@
 #include "InputActionValue.h"
 #include "InteractionQueueComponent.h"
 #include "Engine/LocalPlayer.h"
+#include "Tournament/TournamentManager.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -48,7 +49,9 @@ void AShotTillDeathCharacter::BeginPlay()
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			Subsystem->AddMappingContext(MovementMappingContext, 0);
+			Subsystem->AddMappingContext(DefaultMappingContext, 1);
+			Subsystem->AddMappingContext(ItemMappingContext, 2);
 		}
 	}
 
@@ -60,8 +63,8 @@ void AShotTillDeathCharacter::SetupPlayerInputComponent(UInputComponent* PlayerI
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		// Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AShotTillDeathCharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AShotTillDeathCharacter::StopJumping);
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AShotTillDeathCharacter::Move);
@@ -71,6 +74,11 @@ void AShotTillDeathCharacter::SetupPlayerInputComponent(UInputComponent* PlayerI
 
 		//Interacting
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AShotTillDeathCharacter::Interact);
+		
+		EnhancedInputComponent->BindAction(ExitAction, ETriggerEvent::Triggered, this, &AShotTillDeathCharacter::ExitTournament);
+		
+		EnhancedInputComponent->BindAction(UseAction, ETriggerEvent::Triggered, this, &AShotTillDeathCharacter::TryUseItem);
+		EnhancedInputComponent->BindAction(DropAction, ETriggerEvent::Triggered, this, &AShotTillDeathCharacter::DropItem);
 	}
 	else
 	{
@@ -78,46 +86,27 @@ void AShotTillDeathCharacter::SetupPlayerInputComponent(UInputComponent* PlayerI
 	}
 }
 
-void AShotTillDeathCharacter::SetupPlayerInputs()
+void AShotTillDeathCharacter::EndTournamentSetupInputs_Implementation()
 {
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			Subsystem->RemoveMappingContext(TournamentMappingContext);
+			Subsystem->AddMappingContext(MovementMappingContext, 0);
 		}
-		
-		/*if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
-		{
-			// Jumping
-			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-
-			// Moving
-			EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AShotTillDeathCharacter::Move);
-
-			// Looking
-			EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AShotTillDeathCharacter::Look);
-
-			//Interacting
-			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AShotTillDeathCharacter::Interact);
-		}*/
 	}
 }
 
-void AShotTillDeathCharacter::ClearPlayerInputs()
+void AShotTillDeathCharacter::StartTournamentClearInputs_Implementation()
 {
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->RemoveMappingContext(DefaultMappingContext);
+			Subsystem->AddMappingContext(TournamentMappingContext, 3);
+			Subsystem->RemoveMappingContext(MovementMappingContext);
 		}
-		/*if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
-		{
-			// UnbindAction
-			EnhancedInputComponent->ClearActionBindings();
-		}*/
 	}
 }
 
@@ -155,4 +144,14 @@ void AShotTillDeathCharacter::Interact()
 	}
 
 	InteractionQueueComponent->StartInteraction();
+}
+
+void AShotTillDeathCharacter::Jump()
+{
+	Super::Jump();
+}
+
+void AShotTillDeathCharacter::StopJumping()
+{
+	Super::StopJumping();
 }

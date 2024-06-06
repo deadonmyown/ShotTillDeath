@@ -7,6 +7,7 @@
 #include "InteractionQueueComponent.h"
 #include "ItemInterface.h"
 #include "GameFramework/Actor.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "PickupActor.generated.h"
 
 class AShotTillDeathBaseCharacter;
@@ -35,18 +36,6 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category="Item")
 	FOnUseItem OnUseItem;
-
-	/** MappingContext */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	class UInputMappingContext* ItemMappingContext;
-
-	/** Use Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	class UInputAction* UseAction;
-
-	/** Drop Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	UInputAction* DropAction;
 
 	UFUNCTION(BlueprintCallable, Category="Pickup")
 	bool TakePickupItem(AShotTillDeathBaseCharacter* OtherActor);
@@ -159,10 +148,6 @@ private:
 
 	virtual bool FinishInteraction_Implementation(AActor* OtherActor) override;
 
-	struct FEnhancedInputActionEventBinding* UseActionEventBinding = nullptr;
-
-	FEnhancedInputActionEventBinding* DropActionEventBinding = nullptr;
-
 	/** Line of sight trace channel. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Pickup",
 		meta=(AllowPrivateAccess))
@@ -177,6 +162,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Pickup",
 		meta=(AllowPrivateAccess))
 	float SightRadius = 32.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Pickup",
+		meta=(AllowPrivateAccess))
+	TEnumAsByte<EDrawDebugTrace::Type> DebugTrace = EDrawDebugTrace::Type::None;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Pickup",
 		meta=(AllowPrivateAccess))

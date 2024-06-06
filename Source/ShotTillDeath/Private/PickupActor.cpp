@@ -4,7 +4,6 @@
 #include "EnhancedInputSubsystems.h"
 #include "InteractionComponent.h"
 #include "ItemInterface.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "ShotTillDeath/ShotTillDeathCharacter.h"
 
 APickupActor::APickupActor()
@@ -164,23 +163,6 @@ void APickupActor::AttachItem()
 	
 	// switch bHasItem so the animation blueprint can switch to another animation set
 	TargetActor->SetItem(this);
-
-	// Set up action bindings
-	if (APlayerController* PlayerController = Cast<APlayerController>(TargetActor->GetController()))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->AddMappingContext(ItemMappingContext, 1);
-		}
-
-		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
-		{
-			// BindAction
-			UseActionEventBinding = &EnhancedInputComponent->BindAction(UseAction, ETriggerEvent::Triggered, this, &APickupActor::TryUseItem);
-			DropActionEventBinding = &EnhancedInputComponent->BindAction(DropAction, ETriggerEvent::Triggered, this, &APickupActor::DropItem);
-			
-		}
-	}
 }
 
 void APickupActor::DetachItem()
@@ -195,23 +177,6 @@ void APickupActor::DetachItem()
 	SetActorRotation(FRotator::ZeroRotator);
 
 	TargetActor->ResetItem();
-
-	//Clear inputs
-	if (APlayerController* PlayerController = Cast<APlayerController>(TargetActor->GetController()))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->RemoveMappingContext(ItemMappingContext);
-		}
-
-		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
-		{
-			// UnbindAction
-			EnhancedInputComponent->RemoveBinding(*UseActionEventBinding);
-			EnhancedInputComponent->RemoveBinding(*DropActionEventBinding);
-		}
-	}
-
 	
 	FHitResult HitResult = GetFloor();
 	if(IsValid(HitResult.GetActor()))
@@ -294,7 +259,7 @@ FHitResult APickupActor::GetFloor()
 		TraceChannel,
 		false,
 		{GetOwner(), TargetActor},
-		EDrawDebugTrace::ForDuration,
+		DebugTrace,
 		HitResult,
 		true,
 		FLinearColor::Red,

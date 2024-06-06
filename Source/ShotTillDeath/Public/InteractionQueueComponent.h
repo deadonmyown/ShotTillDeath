@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "InteractionQueueComponent.generated.h"
 
 USTRUCT(BlueprintType)
@@ -177,6 +178,14 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Interaction",
 		meta=(AllowPrivateAccess, EditCondition="bUseLineOfSight"))
 	float SightRadius = 32.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Interaction",
+		meta=(AllowPrivateAccess, EditCondition="bUseLineOfSight"))
+	TEnumAsByte<EDrawDebugTrace::Type> DebugTrace = EDrawDebugTrace::Type::None;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Character",
+		meta=(AllowPrivateAccess, EditCondition="bUseLineOfSight"))
+	float DebugDrawTime = 0.05f;
 
 	/** The actor caught by line of sight. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Interaction", meta=(AllowPrivateAccess))
