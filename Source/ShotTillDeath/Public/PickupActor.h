@@ -10,6 +10,13 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "PickupActor.generated.h"
 
+UENUM(BlueprintType)
+enum EPickupItemType
+{
+	Injector = 0 UMETA(DisplayName = "Injector"),
+	ShopItem = 1 UMETA(DisplayName = "Shop Item"),
+};
+
 class AShotTillDeathBaseCharacter;
 class UInteractionComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPickupActivated);
@@ -36,6 +43,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category="Item")
 	FOnUseItem OnUseItem;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item")
+	TEnumAsByte<EPickupItemType> PickupItemType = EPickupItemType::Injector;
 
 	UFUNCTION(BlueprintCallable, Category="Pickup")
 	bool TakePickupItem(AShotTillDeathBaseCharacter* OtherActor);

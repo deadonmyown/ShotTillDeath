@@ -50,7 +50,6 @@ void AInjectorHolder::GenerateRandomInjectors()
 		APickupActor* Injector = GetWorld()->SpawnActor<APickupActor>(TypesOfInjector[RandInjectorIndex], CurrentInjectorLocations[i], FRotator::ZeroRotator, SpawnInfo);
 		Injector->DisablePickup();
 		Injector->OnUseItem.AddDynamic(this, &AInjectorHolder::SetNewTurn);
-		Injector->OnUseItem.AddDynamic(this, &AInjectorHolder::SetNewActiveInjectorOnUseItem);
 		CurrentInjectors.Add(Injector);
 	}
 	SetNewActiveInjector();
@@ -91,26 +90,26 @@ void AInjectorHolder::SetActiveLocationForInjectors()
 	}
 }
 
-void AInjectorHolder::SetNewActiveInjectorOnUseItem(APickupActor* PickupActor, bool IsUseItemSuccess)
+void AInjectorHolder::TrySetNewActiveInjector(APickupActor* PickupActor, bool IsUseItemSuccess, bool ShouldSetNewActiveInjector)
 {
 	if(!IsUseItemSuccess || !GetWorld())
 	{
 		return;
 	}
 
-	PickupActor->DropItem();
-	GetWorld()->DestroyActor(PickupActor);
-	//CurrentInjectors.Remove(PickupActor);
-	
-	SetNewActiveInjector();
+	DestroyInjector(PickupActor);
+
+	if(ShouldSetNewActiveInjector)
+	{
+		SetNewActiveInjector();
+	}
 }
 
 void AInjectorHolder::SetNewActiveInjector()
 {
 	if(CurrentInjectors.IsEmpty())
 	{
-		InjectorsCount += InjectorsAdd;
-		GenerateRandomInjectors();
+		UpdateInjectors();
 		return;
 	}
 	
@@ -122,6 +121,16 @@ void AInjectorHolder::SetNewActiveInjector()
 	CurrentActiveInjector->SetDefaultTransform(ActiveLocationForInjectors);
 	
 	CurrentInjectors.Remove(CurrentActiveInjector);
+}
+
+void AInjectorHolder::UpdateInjectors()
+{
+	if(!CurrentInjectors.IsEmpty())
+	{
+		return;
+	}
+	InjectorsCount += InjectorsAdd;
+	GenerateRandomInjectors();
 }
 
 void AInjectorHolder::ResetInjectors()

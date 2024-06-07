@@ -66,10 +66,13 @@ public:
 	void SetInjectorsLocations(int Count);
 
 	UFUNCTION(BlueprintCallable, Category = "InjectorHolder")
-	void SetNewActiveInjectorOnUseItem(APickupActor* PickupActor, bool IsUseItemSuccess);
+	void TrySetNewActiveInjector(APickupActor* PickupActor, bool IsUseItemSuccess, bool ShouldSetNewActiveInjector = true);
 
 	UFUNCTION(BlueprintCallable, Category = "InjectorHolder")
 	void SetNewActiveInjector();
+
+	UFUNCTION(BlueprintCallable, Category = "InjectorHolder")
+	void UpdateInjectors();
 
 	UFUNCTION(BlueprintCallable, Category = "InjectorHolder")
 	void ResetInjectors();
